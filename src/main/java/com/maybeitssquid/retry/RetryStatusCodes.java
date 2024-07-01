@@ -29,6 +29,8 @@ import java.util.function.Predicate;
  */
 public class RetryStatusCodes implements Predicate<HttpServletResponse> {
 
+    public static final int SC_TOO_EARLY = 425;
+
     public static final int SC_TOO_MANY_REQUESTS = 429;
 
     /**
@@ -53,6 +55,8 @@ public class RetryStatusCodes implements Predicate<HttpServletResponse> {
         DEFAULTS[HttpServletResponse.SC_REQUEST_TIMEOUT - OFFSET] = true;
         // 409 is conflict in resource state, it may resolve upon retry
         DEFAULTS[HttpServletResponse.SC_CONFLICT - OFFSET] = true;
+        // 425 is due to risk of replay of data during TLS negotiation, expect server to ensure safe retry
+        DEFAULTS[SC_TOO_EARLY - OFFSET] = true;
         // 429 is server-managed throttling of the client, expect server to ensure safe retry
         DEFAULTS[SC_TOO_MANY_REQUESTS - OFFSET] = true;
 
