@@ -11,7 +11,7 @@ import java.util.function.Predicate;
  *
  * <table>
  *     <thead>
- *         <tr><th>Status</th><th>Non-Idempotent</th><th>Idempotent</th></tr>
+ *         <tr><th>Status</th><th>Idempotent</th><th>Non-Idempotent</th></tr>
  *     </thead>
  *     <tbody>
  *          <tr><td>1xx</td><td>true</td><td>true</td></tr>
@@ -21,7 +21,7 @@ import java.util.function.Predicate;
  *          <tr><td>{@link HttpServletResponse#SC_REQUEST_TIMEOUT 408}</td><td>true</td><td>true</td></tr>
  *          <tr><td>{@link HttpServletResponse#SC_CONFLICT 409}</td><td>true</td><td>true</td></tr>
  *          <tr><td>429</td><td>true</td><td>true</td></tr>
- *          <tr><td>5xx</td><td>false</td><td>true</td></tr>
+ *          <tr><td>5xx</td><td>true</td><td><strong>false</strong></td></tr>
  *          <tr><td>{@link HttpServletResponse#SC_NOT_IMPLEMENTED 501}</td><td>false</td><td>false</td></tr>
  *          <tr><td>{@link HttpServletResponse#SC_HTTP_VERSION_NOT_SUPPORTED 505}</td><td>false</td><td>false</td></tr>
  *     </tbody>
