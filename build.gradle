@@ -9,6 +9,12 @@ repositories {
     mavenCentral()
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
 dependencies {
     implementation "org.slf4j:slf4j-api:$slf4jVersion"
     implementation "jakarta.servlet:jakarta.servlet-api:$servletApiVersion"
