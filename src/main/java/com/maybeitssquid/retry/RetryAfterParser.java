@@ -23,8 +23,12 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
 
     private final List<Function<String, Optional<Duration>>> parsers;
 
+    /**
+     * Logger for errors during parsing, particularly to diagnose a misbehaving server.
+     */
     public static final Logger LOGGER = LoggerFactory.getLogger(RetryAfterParser.class);
 
+    /** The {@code Retry-After} header name. */
     public static final String RETRY_AFTER_HEADER = "Retry-After";
 
     private static final DateTimeFormatter RFC_850_FORMATTER = DateTimeFormatter.ofPattern("[EEEE, ]d-MMM-yy H:m[:s] z");
@@ -112,7 +116,7 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
 
     /**
      * Accept {@code Retry-After} header that matches only strict
-     * <a href="https://datatracker.ietf.org/doc/html/rfc7231#section-7.1.3>RFC 7231</a> {@code delay-seconds}.
+     * <a href="https://datatracker.ietf.org/doc/html/rfc7231#section-7.1.3">RFC 7231</a> {@code delay-seconds}.
      */
     public static final Function<String, Optional<Duration>> STRICT_SECONDS = new PatternGuarded<>(
             "^\\d+$",

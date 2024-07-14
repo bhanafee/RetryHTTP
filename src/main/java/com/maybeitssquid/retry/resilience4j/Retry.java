@@ -9,7 +9,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.time.Duration;
 import java.util.function.Consumer;
 
-public class Retry {
+/**
+ * Factories for common configurations.
+ */
+public interface Retry {
 
     /**
      * Adds a {@link java.util.function.Predicate} that decides whether to retry based on the HTTP status code in the
@@ -107,6 +110,7 @@ public class Retry {
      * Adds an {@link IntervalBiFunction} that respects any {@code Retry-After} header provided in the response, and
      * adds a predicate to ensure the wait does not exceed the limit.
      *
+     * @param limit the longest the client should wait.
      * @return consumer that uses Retry-After for retry decisions and waits.
      */
     public static Consumer<RetryConfig.Builder<HttpServletResponse>> retryAfter(final Duration limit) {

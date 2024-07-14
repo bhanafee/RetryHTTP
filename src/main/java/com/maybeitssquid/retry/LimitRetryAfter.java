@@ -26,7 +26,7 @@ public class LimitRetryAfter implements Predicate<HttpServletResponse> {
      * Creates a predicate to limit intervals requested by an HTTP Retry-After header.
      *
      * @param maximum the maximum wait interval
-     * @param parser  the parser for the headers.
+     * @param parser  the parser for the headers
      */
     public LimitRetryAfter(final Duration maximum, final Function<HttpServletResponse, Optional<Duration>> parser) {
         this.parser = parser;
@@ -37,6 +37,7 @@ public class LimitRetryAfter implements Predicate<HttpServletResponse> {
      * Creates a predicate to limit intervals requested by an HTTP Retry-After header, using an extended parser.
      *
      * @param limit the maximum wait interval
+     * @return a limiter predicate
      * @see RetryAfterParser#extended()
      */
     public static LimitRetryAfter maximum(final Duration limit) {
@@ -46,7 +47,8 @@ public class LimitRetryAfter implements Predicate<HttpServletResponse> {
     /**
      * Convenience wrapper to express the limit in milliseconds.
      *
-     * @param milliseconds the limit in milliseconds.
+     * @param milliseconds the limit in milliseconds
+     * @return a limiter predicate
      * @see #maximum(Duration)
      */
     public static LimitRetryAfter maximum(final long milliseconds) {
@@ -54,9 +56,9 @@ public class LimitRetryAfter implements Predicate<HttpServletResponse> {
     }
 
     /**
-     * Gets the maximum wait interval allowed.
+     * Gets the maximum wait interval allowed
      *
-     * @return the maximum wait interval allowed.
+     * @return the maximum wait interval allowed
      */
     public Duration getMaximum() {
         return this.maximum;
@@ -66,7 +68,7 @@ public class LimitRetryAfter implements Predicate<HttpServletResponse> {
      * Tests whether there is a Retry-After header that would exceed the limit.
      *
      * @param t the HTTP response to check for a Retry-After header
-     * @return false if there is a Retry-After header and the requested duration would exceed the limit.
+     * @return false if there is a Retry-After header and the requested duration would exceed the limit
      */
     @Override
     public boolean test(final HttpServletResponse t) {

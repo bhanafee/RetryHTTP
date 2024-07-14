@@ -29,11 +29,22 @@ public class HeedRetryAfter implements IntervalBiFunction<HttpServletResponse> {
      */
     private final IntervalBiFunction<HttpServletResponse> wrapped;
 
+    /**
+     * Creates a wrapper using the extended header definitions.
+     *
+     * @param parser  the parser for headers, such as from {@link RetryAfterParser}.
+     * @param wrapped the existing bifunction to wrap.
+     */
     public HeedRetryAfter(final IntervalBiFunction<HttpServletResponse> wrapped, final Function<HttpServletResponse, Optional<Duration>> parser) {
         this.wrapped = wrapped;
         this.parser = parser;
     }
 
+    /**
+     * Creates a wrapper using the extended header definitions.
+     *
+     * @param wrapped the existing bifunction to wrap.
+     */
     public HeedRetryAfter(final IntervalBiFunction<HttpServletResponse> wrapped) {
         this(wrapped, RetryAfterParser.extended());
     }

@@ -10,6 +10,7 @@ import java.util.function.Predicate;
  * for HTTP response codes in the 1xx and 3xx ranges, as shown in the following table.
  *
  * <table>
+ *     <caption>Default retry behavior</caption>
  *     <thead>
  *         <tr><th>Status</th><th>Idempotent</th><th>Non-Idempotent</th></tr>
  *     </thead>
@@ -29,8 +30,12 @@ import java.util.function.Predicate;
  */
 public class RetryStatusCodes implements Predicate<HttpServletResponse> {
 
+    /**
+     * The HTTP status code for a retry being too early.
+     */
     public static final int SC_TOO_EARLY = 425;
 
+    /** The HTTP status code for a server complaining of too many requests. */
     public static final int SC_TOO_MANY_REQUESTS = 429;
 
     /**
