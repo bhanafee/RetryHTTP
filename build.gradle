@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'jvm-test-suite'
+    id 'maven-publish'
 }
 
 group = 'com.maybeitssquid'
@@ -35,6 +36,29 @@ testing {
             dependencies {
                 implementation "org.mockito:mockito-core:$mockitoVersion"
                 implementation "org.mockito:mockito-junit-jupiter:$mockitoVersion"
+            }
+        }
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = "$group"
+            artifactId = "retry"
+            version = "$version"
+            artifact jar
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/bhanafee/RetryHTTP"
+            credentials {
+                username = System.getenv("USERNAME")
+                password = System.getenv("TOKEN")
             }
         }
     }
