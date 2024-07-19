@@ -35,8 +35,15 @@ public class RetryStatusCodes implements Predicate<HttpServletResponse> {
      */
     public static final int SC_TOO_EARLY = 425;
 
-    /** The HTTP status code for a server complaining of too many requests. */
+    /**
+     * The HTTP status code for a server complaining of too many requests.
+     */
     public static final int SC_TOO_MANY_REQUESTS = 429;
+
+    /**
+     * The number of valid status codes
+     */
+    private static final int CODES = 500;
 
     /**
      * Offset applied to responses table entry because 0xx status codes are unused.
@@ -44,28 +51,38 @@ public class RetryStatusCodes implements Predicate<HttpServletResponse> {
     private static final int OFFSET = 100;
 
     /**
-     * Default decisions for retry. Note that index is {@link #OFFSET} from status codes.
+     * Default decisions for non-idempotent retry. Note that index is {@link #OFFSET} from status codes.
      */
-    private static final boolean[] DEFAULTS = new boolean[500];
+    private static final boolean[] IDEMPOTENT_DEFAULTS = new boolean[CODES];
+
+    /**
+     * Default decisions for non-idempotent retry. Note that index is {@link #OFFSET} from status codes.
+     */
+    private static final boolean[] NON_IDEMPOTENT_DEFAULTS = new boolean[CODES];
 
     static {
         // 1xx are incomplete results, so the “retry” is to continue processing
-        Arrays.fill(DEFAULTS, 100 - OFFSET, 199 - OFFSET, true);
+        Arrays.fill(NON_IDEMPOTENT_DEFAULTS, 100 - OFFSET, 199 - OFFSET, true);
         // 3xx are redirections, so the “retry” is to follow the redirection to a new target
-        Arrays.fill(DEFAULTS, 300 - OFFSET, 399 - OFFSET, true);
+        Arrays.fill(NON_IDEMPOTENT_DEFAULTS, 300 - OFFSET, 399 - OFFSET, true);
 
         // 4xx is client error, but there a few where retry should be safe
 
         // 408 is request timeout, server confirming it did not receive the request so OK to retry
-        DEFAULTS[HttpServletResponse.SC_REQUEST_TIMEOUT - OFFSET] = true;
+        NON_IDEMPOTENT_DEFAULTS[HttpServletResponse.SC_REQUEST_TIMEOUT - OFFSET] = true;
         // 409 is conflict in resource state, it may resolve upon retry
-        DEFAULTS[HttpServletResponse.SC_CONFLICT - OFFSET] = true;
+        NON_IDEMPOTENT_DEFAULTS[HttpServletResponse.SC_CONFLICT - OFFSET] = true;
         // 425 is due to risk of replay of data during TLS negotiation, expect server to ensure safe retry
-        DEFAULTS[SC_TOO_EARLY - OFFSET] = true;
+        NON_IDEMPOTENT_DEFAULTS[SC_TOO_EARLY - OFFSET] = true;
         // 429 is server-managed throttling of the client, expect server to ensure safe retry
-        DEFAULTS[SC_TOO_MANY_REQUESTS - OFFSET] = true;
+        NON_IDEMPOTENT_DEFAULTS[SC_TOO_MANY_REQUESTS - OFFSET] = true;
 
-        // 5xx codes are managed in the constructor based on idempotence.
+
+        System.arraycopy(NON_IDEMPOTENT_DEFAULTS, 0, IDEMPOTENT_DEFAULTS, 0, CODES);
+        // 5xx codes are retried, with exceptions
+        Arrays.fill(IDEMPOTENT_DEFAULTS, 500 - OFFSET, 599 - OFFSET, true);
+        IDEMPOTENT_DEFAULTS[HttpServletResponse.SC_NOT_IMPLEMENTED - OFFSET] = false;
+        IDEMPOTENT_DEFAULTS[HttpServletResponse.SC_HTTP_VERSION_NOT_SUPPORTED- OFFSET] = false;
     }
 
     /**
@@ -79,23 +96,15 @@ public class RetryStatusCodes implements Predicate<HttpServletResponse> {
      * @param idempotent whether the service is idempotent. If it is not idempotent, server errors are not retried
      *                   unless explicitly allowed by the {@code retry} parameter.
      * @param additional status codes that are expressly allowed for retry. Codes in this list override defaults.
-     * @throws ArrayIndexOutOfBoundsException if any of the retry status codes are out of the range 100..599
+     * @throws ArrayIndexOutOfBoundsException if any of the additional status codes are out of the range 100..599
      */
     private RetryStatusCodes(final boolean idempotent, final int... additional) {
-        if (!idempotent && (additional != null && additional.length == 0)) {
-            this.responses = DEFAULTS;
+        if (additional == null || additional.length == 0) {
+            this.responses = idempotent ? IDEMPOTENT_DEFAULTS : NON_IDEMPOTENT_DEFAULTS;
         } else {
-            this.responses = Arrays.copyOf(DEFAULTS, DEFAULTS.length);
-            if (idempotent) {
-                // 5xx codes are retried, with exceptions
-                Arrays.fill(this.responses, 500 - OFFSET, 599 - OFFSET, true);
-                this.responses[HttpServletResponse.SC_NOT_IMPLEMENTED - OFFSET] = false;
-                this.responses[HttpServletResponse.SC_HTTP_VERSION_NOT_SUPPORTED - OFFSET] = false;
-            }
-            if (additional != null) {
-                for (int r : additional) {
-                    this.responses[r - OFFSET] = true;
-                }
+            this.responses = Arrays.copyOf(idempotent ? IDEMPOTENT_DEFAULTS : NON_IDEMPOTENT_DEFAULTS, CODES);
+            for (int r : additional) {
+                this.responses[r - OFFSET] = true;
             }
         }
     }
@@ -107,7 +116,7 @@ public class RetryStatusCodes implements Predicate<HttpServletResponse> {
      * @throws ArrayIndexOutOfBoundsException if any of the retry status codes are out of the range 100..599
      */
     private RetryStatusCodes(final int... only) {
-        this.responses = new boolean[500];
+        this.responses = new boolean[CODES];
         for (int r : only) {
             this.responses[r - OFFSET] = true;
         }
