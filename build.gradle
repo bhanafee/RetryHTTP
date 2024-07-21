@@ -13,14 +13,14 @@ repositories {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(toolchainJavaVersion)
     }
     withSourcesJar()
     withJavadocJar()
 }
 
 compileJava {
-    options.release = 17
+    options.release = targetJavaVersion as Integer
 }
 
 dependencies {
