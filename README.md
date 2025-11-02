@@ -18,12 +18,13 @@ server, retries could make the problem worse. Retries should be attempted after 
 methods as described in section 4.2.2 of [RFC-7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-4.2.2).
 
 This package provides separate predicates for use with idempotent and non-idempotent functions. The predicates differ
-only in their handling of 5xx response codes. The `501 Not Implemented` and `505 HTTP Version Not Supported` statuses
-are never retried, because it is extremely unlikely that a retry would result in a different response.
+only in their handling of 5xx response codes. In most cases, the idempotent predicate retries `5xx` responses but the
+non-idempotent does not. However, the `501 Not Implemented` and `505 HTTP Version Not Supported` statuses
+are never retried because it is extremely unlikely that a retry would result in a different response.
 
 ### Handling expected next request
 
-Some HTTP response codes carry an expectation that the client will react with an additional HTTP request . For example,
+Some HTTP response codes carry an expectation that the client will react with an additional HTTP request. For example,
 when a server responds with a `302` redirection the client is typically expected to issue a second request to location
 specified in the redirect. The server is responding normally, so it should not be counted as a failure. Some HTTP
 clients can be configured to follow redirections silently and automatically. However, this package **does** treat the
@@ -49,7 +50,7 @@ wait interval would be too long, and a bulkhead function that can adjust the wai
 
 A `Predicate<HttpServletResponse>` can be configured to block retries if heeding the `Retry-After` header would result
 in an unacceptably long delay. Setting a predicate is important. The header can specify an arbitrary date that could
-be minutes, hours or even years in the future, while the client may be willing to wait at most only a few seconds.
+be minutes, hours, or even years in the future, while the client may be willing to wait at most only a few seconds.
 
 ### Wait interval bulkhead
 
