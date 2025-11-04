@@ -30,23 +30,21 @@ dependencies {
 }
 
 testing {
-    suites {
-        test {
-            useJUnitJupiter()
-            dependencies {
-                implementation "org.mockito:mockito-core:$mockitoVersion"
-                implementation "org.mockito:mockito-junit-jupiter:$mockitoVersion"
-            }
+    suites.test {
+        useJUnitJupiter()
+        dependencies {
+            implementation "org.mockito:mockito-core:$mockitoVersion"
+            implementation "org.mockito:mockito-junit-jupiter:$mockitoVersion"
         }
     }
 }
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            groupId = "$group"
+        create('mavenJava', MavenPublication) {
+            groupId = group
             artifactId = "retry"
-            version = "$version"
+            version = version
             artifact jar
             artifact sourcesJar
             artifact javadocJar
