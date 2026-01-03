@@ -13,51 +13,21 @@ repositories {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(toolchainJavaVersion)
+        languageVersion = JavaLanguageVersion.of(21)
     }
     withSourcesJar()
     withJavadocJar()
 }
 
-compileJava {
-    options.release = targetJavaVersion as Integer
-}
-
 dependencies {
-    implementation "org.slf4j:slf4j-api:$slf4jVersion"
-    implementation "jakarta.servlet:jakarta.servlet-api:$servletApiVersion"
-    implementation "io.github.resilience4j:resilience4j-retry:$resilience4jVersion"
+    implementation libs.slf4j.api
+    implementation libs.jakarta.servlet.api
+    implementation libs.resilience4j.retry
+    testImplementation libs.bundles.mockito
 }
 
 testing {
     suites.test {
-        useJUnitJupiter()
-        dependencies {
-            implementation "org.mockito:mockito-core:$mockitoVersion"
-            implementation "org.mockito:mockito-junit-jupiter:$mockitoVersion"
-        }
-    }
-}
-
-publishing {
-    publications {
-        create('mavenJava', MavenPublication) {
-            groupId = group
-            artifactId = "retry"
-            version = version
-            artifact jar
-            artifact sourcesJar
-            artifact javadocJar
-        }
-    }
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/bhanafee/RetryHTTP"
-            credentials {
-                username = System.getenv("USERNAME")
-                password = System.getenv("TOKEN")
-            }
-        }
+        useJUnitJupiter(libs.versions.junit)
     }
 }

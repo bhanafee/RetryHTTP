@@ -1,0 +1,16 @@
+[versions]
+slf4j = { require = "[2,)" }
+junit = { strictly = "[5,)", prefer = "6.0.+" }
+servlet-api = "6.1+"
+resilience4j = "2+"
+mockito = "5+"
+
+[libraries]
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+jakarta-servlet-api = { module = "jakarta.servlet:jakarta.servlet-api", version.ref = "servlet-api" }
+resilience4j-retry = { module = "io.github.resilience4j:resilience4j-retry", version.ref = "resilience4j" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
+
+[bundles]
+mockito = ["mockito-core", "mockito-junit-jupiter"]
