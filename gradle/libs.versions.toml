@@ -1,8 +1,19 @@
 [versions]
+
+# Java toolchain
+java = "21"
+
+# Logging
 slf4j = { require = "[2,)" }
-junit = { strictly = "[5,)", prefer = "6.0.+" }
+
+# Web / Servlet
 servlet-api = "6.1+"
+
+# Resilience
 resilience4j = "2+"
+
+# Testing
+junit = { strictly = "[5,)", prefer = "6.0.+" }
 mockito = "5+"
 
 [libraries]
