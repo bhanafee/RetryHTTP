@@ -3,8 +3,12 @@
 # Java toolchain
 java = "21"
 
+# Plugin versions
+spotless = "8.+"
+owasp-dependencycheck = "12.+"
+
 # Logging
-slf4j = { require = "[2,)" }
+slf4j = "2.+"
 
 # Web / Servlet
 servlet-api = "6.1+"
@@ -13,8 +17,8 @@ servlet-api = "6.1+"
 resilience4j = "2+"
 
 # Testing
-junit = { strictly = "[5,)", prefer = "6.0.+" }
-mockito = "5+"
+junit = { strictly = "[5,)", prefer = "5.12.+" }
+mockito = "5.+"
 
 [libraries]
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
@@ -25,3 +29,7 @@ mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.
 
 [bundles]
 mockito = ["mockito-core", "mockito-junit-jupiter"]
+
+[plugins]
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+owasp-dependencycheck = { id = "org.owasp.dependencycheck", version.ref = "owasp-dependencycheck" }

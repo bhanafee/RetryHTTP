@@ -1,7 +1,15 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
 plugins {
     id 'java-library'
     id 'jvm-test-suite'
     id 'maven-publish'
+    alias(libs.plugins.spotless)
+    alias(libs.plugins.owasp.dependencycheck)
 }
 
 group = 'com.maybeitssquid'
@@ -29,5 +37,27 @@ dependencies {
 testing {
     suites.test {
         useJUnitJupiter(libs.versions.junit)
+    }
+}
+
+spotless {
+    java {
+        targetExclude 'src/*/java/module-info.java'
+        googleJavaFormat()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
+
+dependencyCheck {
+    failBuildOnCVSS = 7
+}
+
+tasks.withType(Javadoc).configureEach {
+    options {
+        encoding = 'UTF-8'
+        links "https://docs.oracle.com/en/java/javase/${libs.versions.java.get()}/docs/api/"
+        addBooleanOption('html5', true)
     }
 }
