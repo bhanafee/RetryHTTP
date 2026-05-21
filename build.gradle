@@ -28,15 +28,22 @@ java {
 }
 
 dependencies {
+    constraints {
+        libs.bundles.security.patches.get().each {
+            add('implementation', it)
+        }
+    }
     implementation libs.slf4j.api
     implementation libs.jakarta.servlet.api
     implementation libs.resilience4j.retry
-    testImplementation libs.bundles.mockito
 }
 
 testing {
     suites.test {
         useJUnitJupiter(libs.versions.junit)
+        dependencies {
+            implementation libs.bundles.mockito
+        }
     }
 }
 

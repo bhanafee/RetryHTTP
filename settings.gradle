@@ -1,4 +1,4 @@
-rootProject.name = 'retry'
+rootProject.name = 'RetryHTTP'
 
 gradle.beforeProject { proj ->
     if (proj == proj.rootProject) {
