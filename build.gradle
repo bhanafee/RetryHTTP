@@ -42,7 +42,8 @@ testing {
     suites.test {
         useJUnitJupiter(libs.versions.junit)
         dependencies {
-            implementation libs.bundles.mockito
+            implementation libs.mockito.core
+            implementation libs.mockito.junit.jupiter
         }
     }
 }
