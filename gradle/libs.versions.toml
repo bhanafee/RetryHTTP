@@ -1,5 +1,4 @@
 [versions]
-
 # Java toolchain
 java = "21"
 
