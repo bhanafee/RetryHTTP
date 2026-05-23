@@ -42,6 +42,7 @@ jobs:
 
       - name: Convert Markdown to HTML
         run: |
+          mkdir -p _site
           pandoc README.md \
             --standalone \
             --metadata title="Add HTTP-awareness to resilience libraries" \
