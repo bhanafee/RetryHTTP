@@ -1,21 +1,19 @@
-name: Deploy Javadoc to GitHub Pages
+name: Build Javadoc
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
-  deploy-javadoc:
+  build-javadoc:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout code
@@ -32,17 +30,3 @@ jobs:
 
       - name: Generate Javadoc
         run: ./gradlew javadoc
-
-      - name: Prepare Pages artifact
-        run: |
-          mkdir -p _site/javadoc
-          cp -r build/docs/javadoc/. _site/javadoc/
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v5
-        with:
-          path: _site
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
