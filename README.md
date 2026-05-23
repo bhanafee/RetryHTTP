@@ -5,6 +5,12 @@ and circuit breakers. However, that library does not allow for direct dependency
 include intelligent handling of HTTP response status codes or `Retry-After` headers. This package integrates with
 resilience4j to add those features in the context of`jakarta.servlet.http.HttpServletResponse`.
 
+## Links
+
+- [GitHub repository](https://github.com/bhanafee/RetryHTTP)
+- [Javadoc](https://bhanafee.github.io/RetryHTTP/javadoc/)
+- [Code of Conduct](https://bhanafee.github.io/RetryHTTP/CODE_OF_CONDUCT.html)
+
 ## HTTP status code
 
 At its simplest, some HTTP status codes indicate that the response is complete, so a retry is unnecessary. Other codes
