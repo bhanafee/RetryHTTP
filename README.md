@@ -11,6 +11,7 @@ resilience4j to add those features in the context of `jakarta.servlet.http.HttpS
 - [Javadoc](https://bhanafee.github.io/RetryHTTP/javadoc/)
 - [Apache 2.0 License](https://bhanafee.github.io/RetryHTTP/LICENSE)
 - [Code of Conduct](https://bhanafee.github.io/RetryHTTP/CODE_OF_CONDUCT.html)
+- [Claude Code guidance](https://bhanafee.github.io/RetryHTTP/CLAUDE.html)
 
 ## HTTP status code
 
