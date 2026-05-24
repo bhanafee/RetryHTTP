@@ -360,6 +360,12 @@ h3 {
   font-weight: bold;
 }
 
+h4 {
+  font-size: var(--font-size);
+  line-height: var(--line-height);
+  font-style: italic;
+}
+
 /* No one should ever have more than 4 sidenotes immediately after a heading */
 /* 0 */ h1:not(.title) + :is(*:not(.sidenote-wrapper), p),
 /* 1 */ h1:not(.title) + .sidenote-wrapper + :is(*:not(.sidenote-wrapper), p),
