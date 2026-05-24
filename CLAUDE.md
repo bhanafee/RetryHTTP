@@ -2,9 +2,9 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Overview
+## Project overview
 
-RetryHTTP is a Java library that adds HTTP-awareness to [Resilience4j](https://resilience4j.readme.io). It provides `Predicate<HttpServletResponse>` and `IntervalBiFunction<HttpServletResponse>` implementations that make retry decisions based on HTTP status codes and `Retry-After` response headers, operating on `jakarta.servlet.http.HttpServletResponse`.
+RetryHTTP is a Java library that adds HTTP-awareness to [Resilience4j](https://resilience4j.readme.io). It provides `Predicate<HttpServletResponse>` and `IntervalBiFunction<HttpServletResponse>` implementations that make retry decisions based on HTTP status codes and `Retry-After` response headers, operating on `jakarta.servlet.http.HttpServletResponse`. Published to GitHub Packages as `com.maybeitssquid:RetryHTTP`.
 
 ## Commands
 
@@ -22,7 +22,7 @@ To run a single test class:
 ./gradlew test --tests "com.maybeitssquid.retry.RetryAfterParserTest"
 ```
 
-Java toolchain: Java 21. CI also tests against Java 17 and 25.
+Java toolchain: Java 21. CI tests on Java 17, 21, and 25 on every push/PR to `main`.
 
 ## Architecture
 
@@ -45,4 +45,4 @@ Spotless enforces Google Java Format. Run `./gradlew spotlessApply` before commi
 
 ## Security Patches
 
-`gradle/libs.versions.toml` maintains a `security-patches` bundle of transitive dependency version constraints pinned to safe minimums. `settings.gradle` eagerly resolves these patches into the buildscript classpath so plugin dependencies are also covered. When adding a new CVE patch, add it to both the `[libraries]` section and the `security-patches` bundle.
+`gradle/libs.versions.toml` maintains a `security-patches` bundle of transitive dependency version constraints pinned to safe minimums. `settings.gradle` eagerly resolves these patches into the buildscript classpath so plugin dependencies are also covered. When adding a new CVE patch, add it to both the `[libraries]` section and the `security-patches` bundle. The OWASP dependency check plugin (`./gradlew dependencyCheckAnalyze`) fails the build at CVSS ≥ 7.
