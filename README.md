@@ -9,7 +9,7 @@ resilience4j to add those features in the context of`jakarta.servlet.http.HttpSe
 
 - [GitHub repository](https://github.com/bhanafee/RetryHTTP)
 - [Javadoc](https://bhanafee.github.io/RetryHTTP/javadoc/)
-- [License](https://bhanafee.github.io/RetryHTTP/LICENSE)
+- [Apache 2.0 License](https://bhanafee.github.io/RetryHTTP/LICENSE)
 - [Code of Conduct](https://bhanafee.github.io/RetryHTTP/CODE_OF_CONDUCT.html)
 
 ## HTTP status code
