@@ -3,7 +3,7 @@
 [Resilience4j](https://resilience4j.readme.io) provides extensive support for patterns including retries, bulkheads,
 and circuit breakers. However, that library does not allow for direct dependency on HTTP APIs and therefore does not
 include intelligent handling of HTTP response status codes or `Retry-After` headers. This package integrates with
-resilience4j to add those features in the context of`jakarta.servlet.http.HttpServletResponse`.
+resilience4j to add those features in the context of `jakarta.servlet.http.HttpServletResponse`.
 
 ## Links
 
