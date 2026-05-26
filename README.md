@@ -308,3 +308,15 @@ classDiagram
 `RetryStatusCodes`, `RetryAfterParser`, and `LimitRetryAfter` are in
 `com.maybeitssquid.retry`. `HeedRetryAfter` and `Retry` are in
 `com.maybeitssquid.retry.resilience4j`.
+
+## Technologies
+
+| Component | Version |
+|-----------|---------|
+| Java | 25 (toolchain; runs on 17+) |
+| Gradle | 9.5.1 |
+| Resilience4j | 2+ |
+| Jakarta Servlet API | 6.1+ |
+| SLF4J | 2.+ |
+| JUnit | 5.12.+ |
+| Mockito | 5.+ |
