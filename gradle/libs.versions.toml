@@ -1,6 +1,7 @@
 [versions]
-# Java toolchain
-java = "21"
+# Java toolchain and minimum release for compiled artifacts
+java = "25"
+release = "17"
 
 # Plugin versions
 spotless = "8.+"
