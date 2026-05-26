@@ -37,7 +37,7 @@ fill that gap.
 
 ## Requirements
 
-- Java 17 or higher (Java 21 toolchain used for compilation)
+- Java 17 or higher (Java 25 toolchain used for compilation)
 
 ## Installation
 
