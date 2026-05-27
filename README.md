@@ -6,14 +6,6 @@ dependency on HTTP APIs and therefore does not include intelligent handling of H
 status codes or `Retry-After` headers. This package integrates with Resilience4j to add those
 features in the context of `jakarta.servlet.http.HttpServletResponse`.
 
-## Links
-
-- [GitHub repository](https://github.com/bhanafee/RetryHTTP)
-- [Javadoc](https://bhanafee.github.io/RetryHTTP/javadoc/)
-- [Apache 2.0 License](https://bhanafee.github.io/RetryHTTP/LICENSE)
-- [Code of Conduct](https://bhanafee.github.io/RetryHTTP/CODE_OF_CONDUCT.html)
-- [Claude Code guidance](https://bhanafee.github.io/RetryHTTP/CLAUDE.html)
-
 ## The Problem
 
 Without HTTP awareness, a Resilience4j retry policy retries on any exception or any result
@@ -318,5 +310,16 @@ classDiagram
 | Resilience4j | 2+ |
 | Jakarta Servlet API | 6.1+ |
 | SLF4J | 2.+ |
-| JUnit | 5.12.+ |
+| JUnit | 6.1.0 |
 | Mockito | 5.+ |
+| JaCoCo | 0.8.14 |
+
+## Links
+
+- [GitHub repository](https://github.com/bhanafee/RetryHTTP)
+- [Javadoc](https://bhanafee.github.io/RetryHTTP/javadoc/)
+- [Test Results](https://bhanafee.github.io/RetryHTTP/tests/)
+- [Coverage Report](https://bhanafee.github.io/RetryHTTP/coverage/)
+- [Apache 2.0 License](https://bhanafee.github.io/RetryHTTP/LICENSE)
+- [Code of Conduct](https://bhanafee.github.io/RetryHTTP/CODE_OF_CONDUCT.html)
+- [Claude Code guidance](https://bhanafee.github.io/RetryHTTP/CLAUDE.html)
