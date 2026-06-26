@@ -22,7 +22,9 @@ To run a single test class:
 ./gradlew test --tests "com.maybeitssquid.retry.RetryAfterParserTest"
 ```
 
-Java toolchain: Java 21. CI tests on Java 17, 21, and 25 on every push/PR to `main`.
+On Windows, use `gradlew.bat` (or `.\gradlew` in PowerShell).
+
+Java toolchain: Java 25, compiling to Java 17 bytecode (`release = "17"`). CI tests on Java 17, 21, and 25 on every push/PR to `main`.
 
 ## Architecture
 
@@ -39,10 +41,10 @@ Two packages:
 
 The typical integration pattern is: call `Retry.idempotent(limit)` or `Retry.nonIdempotent(limit)` to get a consumer, then pass it to `RetryConfig.custom()` via `.apply()` or similar.
 
-## Code Style
+## Code style
 
 Spotless enforces Google Java Format. Run `./gradlew spotlessApply` before committing. The `module-info.java` file is excluded from Spotless.
 
-## Security Patches
+## Security patches
 
 `gradle/libs.versions.toml` maintains a `security-patches` bundle of transitive dependency version constraints pinned to safe minimums. `settings.gradle` eagerly resolves these patches into the buildscript classpath so plugin dependencies are also covered. When adding a new CVE patch, add it to both the `[libraries]` section and the `security-patches` bundle. The OWASP dependency check plugin (`./gradlew dependencyCheckAnalyze`) fails the build at CVSS ≥ 7.
