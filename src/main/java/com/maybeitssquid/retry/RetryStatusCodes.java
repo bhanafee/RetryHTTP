@@ -160,11 +160,8 @@ public class RetryStatusCodes implements Predicate<HttpServletResponse> {
    * @return whether the status code allows a retry.
    */
   public boolean retries(final int code) {
-    try {
-      return this.responses[code - OFFSET];
-    } catch (final IndexOutOfBoundsException e) {
-      return false;
-    }
+    final int index = code - OFFSET;
+    return index >= 0 && index < this.responses.length && this.responses[index];
   }
 
   /**
