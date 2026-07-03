@@ -308,7 +308,7 @@ classDiagram
 | Component | Version |
 |-----------|---------|
 | Java | 25 (toolchain; runs on 17+) |
-| Gradle | 9.5.1 |
+| Gradle | 9.6.1 |
 | Resilience4j | 2+ |
 | Jakarta Servlet API | 6.1+ |
 | SLF4J | 2.+ |
