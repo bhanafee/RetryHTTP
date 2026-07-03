@@ -4,8 +4,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -20,7 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RetryAfterParser implements Function<HttpServletResponse, Optional<Duration>> {
 
-  private final List<Function<String, Optional<Duration>>> parsers;
+  private final Function<String, Optional<Duration>>[] parsers;
 
   /** Logger for errors during parsing, particularly to diagnose a misbehaving server. */
   public static final Logger LOGGER = LoggerFactory.getLogger(RetryAfterParser.class);
@@ -35,7 +33,7 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
 
   @SafeVarargs
   private RetryAfterParser(final Function<String, Optional<Duration>>... parsers) {
-    this.parsers = Arrays.asList(parsers);
+    this.parsers = parsers;
   }
 
   /**
