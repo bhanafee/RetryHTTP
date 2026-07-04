@@ -83,3 +83,38 @@ tasks.withType(Javadoc).configureEach {
         addBooleanOption('html5', true)
     }
 }
+
+publishing {
+    repositories {
+        maven {
+            name = 'GitHubPackages'
+            url = uri("https://maven.pkg.github.com/${System.env.GITHUB_REPOSITORY ?: 'bhanafee/RetryHTTP'}")
+            credentials {
+                username = System.env.GITHUB_ACTOR ?: System.env.USERNAME ?: 'bhanafee'
+                password = System.env.GITHUB_TOKEN ?: System.env.TOKEN
+            }
+        }
+    }
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifactId = 'retry-http'
+            pom {
+                name = 'RetryHTTP'
+                description = 'HTTP-aware resilience predicates for Resilience4j'
+                url = 'https://github.com/bhanafee/RetryHTTP'
+                licenses {
+                    license {
+                        name = 'Apache License, Version 2.0'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0'
+                    }
+                }
+                scm {
+                    url = 'https://github.com/bhanafee/RetryHTTP'
+                    connection = 'scm:git:git://github.com/bhanafee/RetryHTTP.git'
+                    developerConnection = 'scm:git:ssh://github.com/bhanafee/RetryHTTP.git'
+                }
+            }
+        }
+    }
+}
