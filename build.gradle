@@ -90,8 +90,8 @@ publishing {
             name = 'GitHubPackages'
             url = uri("https://maven.pkg.github.com/${System.env.GITHUB_REPOSITORY ?: 'bhanafee/RetryHTTP'}")
             credentials {
-                username = System.env.GITHUB_ACTOR ?: System.env.USERNAME ?: 'bhanafee'
-                password = System.env.GITHUB_TOKEN ?: System.env.TOKEN
+                username = project.findProperty('githubActor') ?: System.env.GITHUB_ACTOR ?: System.env.USERNAME ?: 'bhanafee'
+                password = project.findProperty('githubToken') ?: System.env.GITHUB_TOKEN ?: System.env.TOKEN
             }
         }
     }
