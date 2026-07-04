@@ -41,6 +41,18 @@ Two packages:
 
 The typical integration pattern is: call `Retry.idempotent(limit)` or `Retry.nonIdempotent(limit)` to get a consumer, then pass it to `RetryConfig.custom()` via `.apply()` or similar.
 
+## Versioning
+
+Release versions are derived automatically from git tags using [Palantir's gradle-git-version plugin](https://github.com/palantir/gradle-git-version). The plugin inspects the git repository and generates a version string. Tag names should use the format `v<major>.<minor>.<patch>` (e.g., `v1.0.0`); the `v` prefix is stripped in the published version.
+
+To cut a release:
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+The version is automatically picked up by the build and used in published artifacts.
+
 ## Code style
 
 Spotless enforces Google Java Format. Run `./gradlew spotlessApply` before committing. The `module-info.java` file is excluded from Spotless.
