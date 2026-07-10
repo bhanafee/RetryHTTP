@@ -1,7 +1,5 @@
 # Add HTTP-awareness to resilience libraries
 
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-
 [Resilience4j](https://resilience4j.readme.io) provides extensive support for patterns including
 retries, bulkheads, and circuit breakers. However, that library does not allow for direct
 dependency on HTTP APIs and therefore does not include intelligent handling of HTTP response
@@ -322,6 +320,9 @@ classDiagram
 - [Javadoc](https://bhanafee.github.io/RetryHTTP/javadoc/)
 - [Test Results](https://bhanafee.github.io/RetryHTTP/tests/)
 - [Coverage Report](https://bhanafee.github.io/RetryHTTP/coverage/)
-- [Apache 2.0 License](https://bhanafee.github.io/RetryHTTP/LICENSE)
 - [Code of Conduct](https://bhanafee.github.io/RetryHTTP/CODE_OF_CONDUCT.html)
 - [Claude Code guidance](https://bhanafee.github.io/RetryHTTP/CLAUDE.html)
+
+---
+
+**License:** [![Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
