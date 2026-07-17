@@ -27,14 +27,10 @@ patch-cve-2025-48924 = { module = "org.apache.commons:commons-lang3", version = 
 # Security patches - Other
 patch-cve-2022-45868 = { module = "com.h2database:h2", version = { strictly = "[2.2.220,)", prefer = "2.2.220" } }
 patch-cve-2025-4949 = { module = "org.eclipse.jgit:org.eclipse.jgit", version = { strictly = "[6.10.1.202505221210-r,)", prefer = "6.10.1.202505221210-r" } }
-# jackson 2.22.0: core fixes GHSA-72hv-8253-57qq; databind fixes GHSA-5jmj-h7xm-6q6v plus
-# the 2.21.4 advisories (5hh8, 9fxm, hgj6, rmj7, j3rv, rcqc). 2.21.5 was never published, and
-# the stack is kept aligned to avoid mixing core/databind across the 2.21/2.22 boundary.
-# GHSA-5jmj-h7xm-6q6v was later expanded to cover a regression *in* 2.22.0 itself
-# (CVE-2026-54515, GitHub alert #8); fix targeted at 2.22.1, not yet published to Maven
-# Central as of 2026-07-02. Bump databind (and core, for alignment) to 2.22.1+ once it ships.
-patch-ghsa-72hv-8253-57qq = { module = "com.fasterxml.jackson.core:jackson-core", version = { strictly = "[2.22.0,)", prefer = "2.22.0" } }
-patch-ghsa-5jmj-h7xm-6q6v = { module = "com.fasterxml.jackson.core:jackson-databind", version = { strictly = "[2.22.0,)", prefer = "2.22.0" } }
+# jackson 2.22.1: core fixes GHSA-72hv-8253-57qq; databind fixes GHSA-5jmj-h7xm-6q6v.
+# Keep core and databind aligned to avoid mixing across major version boundaries.
+patch-ghsa-72hv-8253-57qq = { module = "com.fasterxml.jackson.core:jackson-core", version = { strictly = "[2.22.1,)", prefer = "2.22.1" } }
+patch-ghsa-5jmj-h7xm-6q6v = { module = "com.fasterxml.jackson.core:jackson-databind", version = { strictly = "[2.22.1,)", prefer = "2.22.1" } }
 
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 jakarta-servlet-api = { module = "jakarta.servlet:jakarta.servlet-api", version.ref = "servlet-api" }
