@@ -4,6 +4,7 @@ java = "25"
 release = "17"
 
 # Plugin versions
+git-version = "5.0.0"
 spotless = "8.+"
 owasp-dependencycheck = "12.+"
 
@@ -43,5 +44,6 @@ security-patches = ["patch-cve-2022-45868", "patch-cve-2025-4949", "patch-cve-20
 mockito = ["mockito-core", "mockito-junit-jupiter"]
 
 [plugins]
+git-version = { id = "com.palantir.git-version", version.ref = "git-version" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 owasp-dependencycheck = { id = "org.owasp.dependencycheck", version.ref = "owasp-dependencycheck" }
