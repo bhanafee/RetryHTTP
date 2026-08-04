@@ -321,6 +321,6 @@ classDiagram
 - [Test Results](https://bhanafee.github.io/RetryHTTP/tests/)
 - [Coverage Report](https://bhanafee.github.io/RetryHTTP/coverage/)
 - [Code of Conduct](https://bhanafee.github.io/RetryHTTP/CODE_OF_CONDUCT.html)
-- [Claude Code guidance](https://bhanafee.github.io/RetryHTTP/CLAUDE.html)
+- [Agents guidance](https://bhanafee.github.io/RetryHTTP/AGENTS.html)
 
 [![Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
