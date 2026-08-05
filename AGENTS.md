@@ -8,16 +8,29 @@ RetryHTTP is a Java library that adds HTTP-awareness to [Resilience4j](https://r
 
 ## Commands
 
+**Build and test:**
 ```bash
-./gradlew build                   # compile, test, spotless check
-./gradlew test                    # run tests
-./gradlew test --tests "..."      # run a single test class
+./gradlew build              # compile, test, spotless check
+./gradlew test               # run all tests
+./gradlew test --tests "*ParserTest"           # run tests by class name
+./gradlew test --tests "*ParserTest.test*"     # run tests by method pattern
+```
+
+**Code quality:**
+```bash
 ./gradlew spotlessApply           # auto-format (required before commit)
-./gradlew javadoc                 # generate Javadoc
 ./gradlew dependencyCheckAnalyze  # OWASP vulnerability scan (slow; fails at CVSS ≥ 7)
 ```
 
+**External dependencies:** Standalone library; integrates with Resilience4j at the application layer.
+
 Build uses Java 25 toolchain, compiles to Java 17 bytecode (`release = "17"`). CI tests on Java 17, 21, and 25.
+
+## Key Entry Points
+
+- **`Retry`** — factory interface; static methods `idempotent()`, `nonIdempotent()` return consumers for wiring into `RetryConfig`
+- **`RetryStatusCodes`** — predicate for HTTP status code decisions
+- **`RetryAfterParser`** — parser for `Retry-After` header values
 
 ## Architecture
 
