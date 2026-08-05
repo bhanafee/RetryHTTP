@@ -23,16 +23,14 @@ Build uses Java 25 toolchain, compiles to Java 17 bytecode (`release = "17"`). C
 
 Two packages:
 
-**`com.maybeitssquid.retry`** — Core, framework-agnostic classes:
-- `RetryStatusCodes` — `Predicate<HttpServletResponse>` that maps HTTP status codes to retry decisions. Factory methods: `idempotent()`, `nonIdempotent()`, `only()`. Backed by a boolean array indexed at `status - 100`.
-- `RetryAfterParser` — `Function<HttpServletResponse, Optional<Duration>>` that parses `Retry-After` headers. Factory methods: `strict()`, `extended()`, `secondsOnly()`, `decimalSeconds()`. The `extended()` variant additionally accepts decimal seconds and ISO-8601 dates.
-- `LimitRetryAfter` — `Predicate<HttpServletResponse>` that blocks retries when a `Retry-After` header requests a wait exceeding a configured maximum.
+**`com.maybeitssquid.retry`** — Core classes:
+- `RetryStatusCodes` — maps HTTP status codes to retry decisions
+- `RetryAfterParser` — parses `Retry-After` headers
+- `LimitRetryAfter` — blocks retries when `Retry-After` exceeds maximum
 
 **`com.maybeitssquid.retry.resilience4j`** — Resilience4j integration:
-- `Retry` interface — Static factory methods that return `Consumer<RetryConfig.Builder<HttpServletResponse>>` for wiring into Resilience4j `RetryConfig`. Overloads accept an optional `Duration` limit to enable `Retry-After` support alongside status code predicates.
-- `HeedRetryAfter` — `IntervalBiFunction<HttpServletResponse>` that wraps an existing `IntervalBiFunction` and extends its wait to honor the `Retry-After` header.
-
-The typical integration pattern is: call `Retry.idempotent(limit)` or `Retry.nonIdempotent(limit)` to get a consumer, then pass it to `RetryConfig.custom()` via `.apply()` or similar.
+- `Retry` — factory for wiring into `RetryConfig`
+- `HeedRetryAfter` — extends wait to honor `Retry-After` header
 
 ## Versioning
 
