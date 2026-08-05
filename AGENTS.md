@@ -9,22 +9,17 @@ RetryHTTP is a Java library that adds HTTP-awareness to [Resilience4j](https://r
 ## Commands
 
 ```bash
-./gradlew build          # compile, test, and lint (spotless check)
-./gradlew test           # run tests only
-./gradlew spotlessApply  # auto-format Java source (run before committing)
-./gradlew spotlessCheck  # check formatting without applying
-./gradlew javadoc        # generate Javadoc
-./gradlew dependencyCheckAnalyze  # OWASP CVE scan (slow; fails build at CVSS >= 7)
-```
-
-To run a single test class:
-```bash
-./gradlew test --tests "com.maybeitssquid.retry.RetryAfterParserTest"
+./gradlew build                   # compile, test, spotless check
+./gradlew test                    # run tests
+./gradlew test --tests "..."      # run a single test class
+./gradlew spotlessApply           # auto-format (required before commit)
+./gradlew javadoc                 # generate Javadoc
+./gradlew dependencyCheckAnalyze  # OWASP vulnerability scan (slow; fails at CVSS ≥ 7)
 ```
 
 On Windows, use `gradlew.bat` (or `.\gradlew` in PowerShell).
 
-Java toolchain: Java 25, compiling to Java 17 bytecode (`release = "17"`). CI tests on Java 17, 21, and 25 on every push/PR to `main`.
+Build uses Java 25 toolchain, compiles to Java 17 bytecode (`release = "17"`). CI tests on Java 17, 21, and 25.
 
 ## Architecture
 
@@ -59,4 +54,4 @@ Spotless enforces Google Java Format. Run `./gradlew spotlessApply` before commi
 
 ## Security patches
 
-`gradle/libs.versions.toml` maintains a `security-patches` bundle of transitive dependency version constraints pinned to safe minimums. `settings.gradle` eagerly resolves these patches into the buildscript classpath so plugin dependencies are also covered. When adding a new CVE patch, add it to both the `[libraries]` section and the `security-patches` bundle. The OWASP dependency check plugin (`./gradlew dependencyCheckAnalyze`) fails the build at CVSS ≥ 7.
+For CVE patch management, see the `gradle-security-patch` skill. Use `/gradle-security-patch` to pin a CVE fix in the version catalog.
