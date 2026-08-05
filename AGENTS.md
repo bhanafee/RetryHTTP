@@ -17,8 +17,6 @@ RetryHTTP is a Java library that adds HTTP-awareness to [Resilience4j](https://r
 ./gradlew dependencyCheckAnalyze  # OWASP vulnerability scan (slow; fails at CVSS ≥ 7)
 ```
 
-On Windows, use `gradlew.bat` (or `.\gradlew` in PowerShell).
-
 Build uses Java 25 toolchain, compiles to Java 17 bytecode (`release = "17"`). CI tests on Java 17, 21, and 25.
 
 ## Architecture
