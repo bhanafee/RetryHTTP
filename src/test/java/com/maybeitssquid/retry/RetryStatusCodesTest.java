@@ -44,6 +44,9 @@ public class RetryStatusCodesTest {
     assertFalse(predicate.retries(Integer.MIN_VALUE));
 
     assertTrue(predicate.retries(100)); // Continue
+    // Range endpoints: Arrays.fill excludes its end index, so these were previously missed
+    assertTrue(predicate.retries(199)); // last 1xx
+    assertTrue(predicate.retries(399)); // last 3xx
     assertFalse(predicate.retries(200)); // OK
     assertTrue(predicate.retries(302)); // Moved temporarily
     assertFalse(predicate.retries(404)); // Not found
@@ -58,6 +61,7 @@ public class RetryStatusCodesTest {
 
     assertTrue(idempotent.retries(500)); // Internal server error
     assertTrue(idempotent.retries(503)); // Service unavailable
+    assertTrue(idempotent.retries(599)); // last 5xx
 
     // Override to retry "not implemented"
     assertTrue(RetryStatusCodes.idempotent(501).retries(501));
@@ -74,6 +78,7 @@ public class RetryStatusCodesTest {
 
     assertFalse(nonIdempotent.retries(500)); // Internal server error
     assertFalse(nonIdempotent.retries(503)); // Service unavailable
+    assertFalse(nonIdempotent.retries(599)); // last 5xx
 
     // Override to retry "not implemented"
     assertTrue(RetryStatusCodes.nonIdempotent(501).retries(501));

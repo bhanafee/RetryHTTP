@@ -55,10 +55,12 @@ public class RetryStatusCodes implements Predicate<HttpServletResponse> {
   private static final boolean[] NON_IDEMPOTENT_DEFAULTS = new boolean[CODES];
 
   static {
+    // Ranges are half-open: Arrays.fill excludes the end index, so it is one past the last code.
+
     // 1xx are incomplete results, so the “retry” is to continue processing
-    Arrays.fill(NON_IDEMPOTENT_DEFAULTS, 100 - OFFSET, 199 - OFFSET, true);
+    Arrays.fill(NON_IDEMPOTENT_DEFAULTS, 100 - OFFSET, 200 - OFFSET, true);
     // 3xx are redirections, so the “retry” is to follow the redirection to a new target
-    Arrays.fill(NON_IDEMPOTENT_DEFAULTS, 300 - OFFSET, 399 - OFFSET, true);
+    Arrays.fill(NON_IDEMPOTENT_DEFAULTS, 300 - OFFSET, 400 - OFFSET, true);
 
     // 4xx is client error, but there a few where retry should be safe
 
@@ -74,7 +76,7 @@ public class RetryStatusCodes implements Predicate<HttpServletResponse> {
 
     System.arraycopy(NON_IDEMPOTENT_DEFAULTS, 0, IDEMPOTENT_DEFAULTS, 0, CODES);
     // 5xx codes are retried, with exceptions
-    Arrays.fill(IDEMPOTENT_DEFAULTS, 500 - OFFSET, 599 - OFFSET, true);
+    Arrays.fill(IDEMPOTENT_DEFAULTS, 500 - OFFSET, 600 - OFFSET, true);
     IDEMPOTENT_DEFAULTS[HttpServletResponse.SC_NOT_IMPLEMENTED - OFFSET] = false;
     IDEMPOTENT_DEFAULTS[HttpServletResponse.SC_HTTP_VERSION_NOT_SUPPORTED - OFFSET] = false;
   }

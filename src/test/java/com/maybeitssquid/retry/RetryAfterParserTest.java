@@ -283,4 +283,42 @@ public class RetryAfterParserTest {
     final Optional<Duration> result = parser.apply(response);
     assertFalse(result.isPresent());
   }
+
+  /**
+   * A delay too large to express in milliseconds must be rejected rather than silently wrapped. The
+   * wrapped value defeated {@link LimitRetryAfter}, which read a multi-million-year delay as a
+   * duration short enough to allow an immediate retry.
+   */
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "9223372036854775807", // Long.MAX_VALUE seconds; overflows on conversion to millis
+        "99999999999999999999", // exceeds long entirely
+        "18446744073709551.616" // wrapped to exactly zero before the fix
+      })
+  void testOversizedDelayRejected(final String header) {
+    assertFalse(RetryAfterParser.STRICT_SECONDS.apply(header).isPresent());
+    assertFalse(RetryAfterParser.DECIMAL_SECONDS.apply(header).isPresent());
+    negativeTest(RetryAfterParser.secondsOnly(), header);
+    negativeTest(RetryAfterParser.extended(), header);
+  }
+
+  /** Every duration the parser returns must survive conversion to milliseconds. */
+  @Test
+  void testLargestAcceptedDelayConvertsToMillis() {
+    final long maxSeconds = Long.MAX_VALUE / 1000L;
+    final Optional<Duration> result =
+        RetryAfterParser.STRICT_SECONDS.apply(String.valueOf(maxSeconds));
+    assertTrue(result.isPresent());
+    assertEquals(maxSeconds * 1000L, result.get().toMillis());
+  }
+
+  /** Sub-millisecond precision is truncated, not rejected. */
+  @ParameterizedTest
+  @CsvSource({"1.5,1500", "1.5555,1555", "0.0001,0", "0.999,999"})
+  void testDecimalTruncation(final String header, final long expectedMillis) {
+    final Optional<Duration> result = RetryAfterParser.DECIMAL_SECONDS.apply(header);
+    assertTrue(result.isPresent());
+    assertEquals(expectedMillis, result.get().toMillis());
+  }
 }

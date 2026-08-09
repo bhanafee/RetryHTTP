@@ -2,6 +2,7 @@ package com.maybeitssquid.retry;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -111,15 +112,29 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
    * Accept {@code Retry-After} header that matches only strict <a
    * href="https://datatracker.ietf.org/doc/html/rfc7231#section-7.1.3">RFC 7231</a> {@code
    * delay-seconds}.
+   *
+   * <p>A delay too large to express in milliseconds is rejected rather than wrapped, so every
+   * {@link Duration} this parser returns is safe to pass to {@link Duration#toMillis()}.
    */
   public static final Function<String, Optional<Duration>> STRICT_SECONDS =
-      new PatternGuarded<>("^\\d+$", h -> Duration.ofSeconds(Long.parseLong(h)));
+      new PatternGuarded<>(
+          "^\\d+$", h -> Duration.ofMillis(Math.multiplyExact(Long.parseLong(h), 1000L)));
 
-  /** Accept extended {@code Retry-After} header that allows decimal seconds. */
+  /**
+   * Accept extended {@code Retry-After} header that allows decimal seconds.
+   *
+   * <p>Precision finer than a millisecond is truncated. A delay too large to express in
+   * milliseconds is rejected rather than wrapped, matching {@link #STRICT_SECONDS}.
+   */
   public static final Function<String, Optional<Duration>> DECIMAL_SECONDS =
       new PatternGuarded<>(
           "^\\d+(\\.\\d*)?$",
-          h -> Duration.ofMillis(new BigDecimal(h).movePointRight(3).longValue()));
+          h ->
+              Duration.ofMillis(
+                  new BigDecimal(h)
+                      .movePointRight(3)
+                      .setScale(0, RoundingMode.DOWN)
+                      .longValueExact()));
 
   /**
    * Forgiving parser for a superset of IMF-fixdate using the builtin {@link
