@@ -8,7 +8,29 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.time.Duration;
 import java.util.function.Consumer;
 
-/** Factories for common configurations. */
+/**
+ * Factories for common configurations.
+ *
+ * <p><strong>Apply these factories after setting the wait interval.</strong> The factories that
+ * heed the {@code Retry-After} header decorate the builder's {@link IntervalBiFunction}. {@link
+ * RetryConfig.Builder#waitDuration(Duration)} and {@link
+ * RetryConfig.Builder#intervalFunction(io.github.resilience4j.core.IntervalFunction)} replace that
+ * function rather than composing with it, so calling either one afterwards discards the {@code
+ * Retry-After} support without warning: the retry then waits the configured interval and ignores
+ * the header. Other builder methods, including {@link RetryConfig.Builder#maxAttempts(int)}, are
+ * unaffected and may be called in any order.
+ *
+ * <pre>{@code
+ * // Correct - wait interval first, factory last
+ * RetryConfig.Builder<HttpServletResponse> builder = RetryConfig.custom();
+ * builder.maxAttempts(3).waitDuration(Duration.ofSeconds(5));
+ * Retry.idempotent(Duration.ofSeconds(30)).accept(builder);
+ *
+ * // Wrong - waitDuration() discards the Retry-After support installed above
+ * Retry.idempotent(Duration.ofSeconds(30)).accept(builder);
+ * builder.waitDuration(Duration.ofSeconds(5));   // header now silently ignored
+ * }</pre>
+ */
 public interface Retry {
 
   /**
@@ -57,6 +79,8 @@ public interface Retry {
    * @param retry status codes that allow retry, in addition to the defaults for idempotent
    *     functions provided by {@link RetryStatusCodes}
    * @return consumer that uses HTTP status code and Retry-After for retry decisions and waits.
+   * @apiNote Apply after {@link RetryConfig.Builder#waitDuration(Duration)}; see the class
+   *     documentation for why order matters.
    */
   public static Consumer<RetryConfig.Builder<HttpServletResponse>> idempotent(
       final Duration limit, final int... retry) {
@@ -73,6 +97,8 @@ public interface Retry {
    * @param retry status codes that allow retry, in addition to the defaults for non-idempotent
    *     functions provided by {@link RetryStatusCodes}
    * @return consumer that uses HTTP status code and Retry-After for retry decisions and waits.
+   * @apiNote Apply after {@link RetryConfig.Builder#waitDuration(Duration)}; see the class
+   *     documentation for why order matters.
    */
   public static Consumer<RetryConfig.Builder<HttpServletResponse>> nonIdempotent(
       final Duration limit, final int... retry) {
@@ -88,6 +114,8 @@ public interface Retry {
    * @param limit the maximum wait interval that will be allowed by a {@code Retry-After}.
    * @param retry complete list of status codes that allow retry
    * @return consumer that uses HTTP status code and Retry-After for retry decisions and waits.
+   * @apiNote Apply after {@link RetryConfig.Builder#waitDuration(Duration)}; see the class
+   *     documentation for why order matters.
    */
   public static Consumer<RetryConfig.Builder<HttpServletResponse>> onlyCodes(
       final Duration limit, final int... retry) {
@@ -105,6 +133,8 @@ public interface Retry {
    * to terminate excessive waits and a Bulkhead to prevent too many outstanding requests.
    *
    * @return consumer that uses Retry-After for retry waits.
+   * @apiNote Apply after {@link RetryConfig.Builder#waitDuration(Duration)}; see the class
+   *     documentation for why order matters.
    */
   public static Consumer<RetryConfig.Builder<HttpServletResponse>> retryAfter() {
     return Retry::heedRetryAfter;
@@ -116,6 +146,8 @@ public interface Retry {
    *
    * @param limit the longest the client should wait.
    * @return consumer that uses Retry-After for retry decisions and waits.
+   * @apiNote Apply after {@link RetryConfig.Builder#waitDuration(Duration)}; see the class
+   *     documentation for why order matters.
    */
   public static Consumer<RetryConfig.Builder<HttpServletResponse>> retryAfter(
       final Duration limit) {

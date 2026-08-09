@@ -209,6 +209,12 @@ guard against excessive waits, the function should be applied in conjunction wit
 imposes a limit. The factory methods provided by `com.maybeitssquid.retry.resilience4j.Retry` that
 accept a `Duration` include both a function and predicate.
 
+> **Order matters.** `RetryConfig.Builder.waitDuration(...)` and `.intervalFunction(...)` replace
+> the builder's interval function instead of composing with it. Calling either one *after* a
+> `Retry` factory silently removes `Retry-After` support — the retry waits the configured interval
+> and ignores the header. Set the wait interval before applying the factory. `maxAttempts(...)` and
+> other builder settings are unaffected and may be applied in any order.
+
 ### Parsing `Retry-After` headers
 
 The `Retry-After` header allows the server to request the client delay an integer number of
