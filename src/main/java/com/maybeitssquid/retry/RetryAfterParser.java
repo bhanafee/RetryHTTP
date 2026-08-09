@@ -45,10 +45,13 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
    * characters are escaped to stop a hostile value from forging log records, and the result is
    * truncated to bound how much a misbehaving server can write to the log.
    *
+   * <p>Package-private rather than private so the escaping can be tested directly. The package is
+   * exported but the method is not accessible outside it.
+   *
    * @param header the raw header value, which may be null.
    * @return a single-line, length-bounded rendering safe to pass to the logger.
    */
-  private static String forLog(final String header) {
+  static String forLog(final String header) {
     if (header == null) {
       return "null";
     }
@@ -263,7 +266,7 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
 
     final String header = rawHeader.trim();
     if (header.isEmpty()) {
-      LOGGER.warn("Received empty Retry-After header \"{}\"", rawHeader);
+      LOGGER.warn("Received empty Retry-After header \"{}\"", forLog(rawHeader));
       return Optional.empty();
     }
 
@@ -275,7 +278,7 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
       }
     }
 
-    LOGGER.warn("Received unrecognized Retry-After header \"{}\"", rawHeader);
+    LOGGER.warn("Received unrecognized Retry-After header \"{}\"", forLog(rawHeader));
     return Optional.empty();
   }
 
@@ -321,7 +324,7 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
             ? Optional.of(parser.apply(header))
             : Optional.empty();
       } catch (final RuntimeException e) {
-        LOGGER.warn("Failed to parse Retry-After header \"{}\"", header, e);
+        LOGGER.warn("Failed to parse Retry-After header \"{}\"", forLog(header), e);
         return Optional.empty();
       }
     }

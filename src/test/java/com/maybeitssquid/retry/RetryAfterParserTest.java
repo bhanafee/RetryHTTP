@@ -322,6 +322,53 @@ public class RetryAfterParserTest {
     assertFalse(limiter.test(response));
   }
 
+  /**
+   * The header comes from the remote server, so a value carrying a newline must not be able to
+   * forge a second log record.
+   */
+  @Test
+  void testForLogEscapesControlCharacters() {
+    final String forged = "60\n2026-08-08 12:00:00 ERROR [auth] user=admin";
+    final String rendered = RetryAfterParser.forLog(forged);
+
+    assertEquals(1, rendered.lines().count());
+    assertFalse(rendered.contains("\n"));
+    assertTrue(rendered.startsWith("60\\u000a"));
+
+    assertEquals("a\\u000db", RetryAfterParser.forLog("a\rb"));
+    assertEquals("a\\u0009b", RetryAfterParser.forLog("a\tb"));
+    assertEquals("a\\u001bb", RetryAfterParser.forLog("a\u001bb")); // ANSI escape
+    assertEquals("a\\u0000b", RetryAfterParser.forLog("a\u0000b"));
+    assertEquals("a\\u007fb", RetryAfterParser.forLog("a\u007fb")); // DEL
+  }
+
+  /** Escaping must be unambiguous: a literal backslash cannot masquerade as an escape. */
+  @Test
+  void testForLogEscapesBackslash() {
+    assertEquals("\\\\u000a", RetryAfterParser.forLog("\\u000a"));
+  }
+
+  /** A misbehaving server must not be able to write an unbounded amount to the log. */
+  @Test
+  void testForLogTruncatesOversizedHeader() {
+    final String rendered = RetryAfterParser.forLog("x".repeat(5000));
+    assertTrue(rendered.endsWith("...(truncated)"));
+    assertTrue(rendered.length() < 200, "rendered length was " + rendered.length());
+  }
+
+  /** Ordinary values must pass through untouched. */
+  @ParameterizedTest
+  @ValueSource(strings = {"120", "1.5", "Thu, 02 Jan 2003 01:23:45 GMT", "garbage"})
+  void testForLogLeavesOrdinaryValuesIntact(final String header) {
+    assertEquals(header, RetryAfterParser.forLog(header));
+  }
+
+  /** A null value must render rather than throw, since the helper runs on the error path. */
+  @Test
+  void testForLogHandlesNull() {
+    assertEquals("null", RetryAfterParser.forLog(null));
+  }
+
   /** Every duration the parser returns must survive conversion to milliseconds. */
   @Test
   void testLargestAcceptedDelayConvertsToMillis() {
