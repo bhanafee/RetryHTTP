@@ -2,6 +2,7 @@ package com.maybeitssquid.retry;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.time.Duration;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -23,11 +24,12 @@ public class LimitRetryAfter implements Predicate<HttpServletResponse> {
    *
    * @param maximum the maximum wait interval
    * @param parser the parser for the headers
+   * @throws NullPointerException if {@code maximum} or {@code parser} is null
    */
   public LimitRetryAfter(
       final Duration maximum, final Function<HttpServletResponse, Optional<Duration>> parser) {
-    this.parser = parser;
-    this.maximum = maximum;
+    this.parser = Objects.requireNonNull(parser, "parser");
+    this.maximum = Objects.requireNonNull(maximum, "maximum");
   }
 
   /**

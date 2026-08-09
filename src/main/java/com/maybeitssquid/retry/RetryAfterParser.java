@@ -153,14 +153,15 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
           h -> LocalDateTime.parse(h, ASCTIME_FORMATTER).atZone(ZoneOffset.UTC));
 
   /**
-   * Parser for ISO-8601 dates.
+   * Parser for ISO-8601 dates. Any number of fractional second digits from 1 to 9 is accepted, not
+   * only whole groups of three.
    *
-   * <p>Example: "2011-12-03T10:15:30Z" Example: "2011-12-03T10:15:30.123Z" Example:
-   * "2011-12-03T10:15:30.123456Z" Example: "2011-12-03T10:15:30.123456789Z"
+   * <p>Example: "2011-12-03T10:15:30Z" Example: "2011-12-03T10:15:30.1Z" Example:
+   * "2011-12-03T10:15:30.123Z" Example: "2011-12-03T10:15:30.123456789Z"
    */
   public static final Function<String, Optional<ZonedDateTime>> ISO =
       new PatternGuarded<>(
-          "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.(\\d{3}){1,3})?Z$",
+          "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,9})?Z$",
           h -> ZonedDateTime.parse(h, DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 
   /**

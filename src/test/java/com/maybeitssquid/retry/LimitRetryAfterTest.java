@@ -51,4 +51,11 @@ public class LimitRetryAfterTest {
     final LimitRetryAfter limiter = LimitRetryAfter.maximum(TWO_SECONDS);
     assertEquals(TWO_SECONDS, limiter.getMaximum());
   }
+
+  @Test
+  void testRejectsNullArguments() {
+    assertThrows(NullPointerException.class, () -> new LimitRetryAfter(TWO_SECONDS, null));
+    assertThrows(
+        NullPointerException.class, () -> new LimitRetryAfter(null, RetryAfterParser.extended()));
+  }
 }
