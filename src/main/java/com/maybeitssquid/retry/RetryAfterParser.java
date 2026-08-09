@@ -37,6 +37,37 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
   /** {@link #MAX_DELAY} in milliseconds, for comparison before conversion. */
   private static final BigDecimal MAX_MILLIS = BigDecimal.valueOf(Long.MAX_VALUE);
 
+  /** Longest prefix of a rejected header echoed into the log. */
+  private static final int MAX_LOGGED = 128;
+
+  /**
+   * Renders a header value for logging. The value comes from the remote server, so control
+   * characters are escaped to stop a hostile value from forging log records, and the result is
+   * truncated to bound how much a misbehaving server can write to the log.
+   *
+   * @param header the raw header value, which may be null.
+   * @return a single-line, length-bounded rendering safe to pass to the logger.
+   */
+  private static String forLog(final String header) {
+    if (header == null) {
+      return "null";
+    }
+    final boolean truncated = header.length() > MAX_LOGGED;
+    final String shown = truncated ? header.substring(0, MAX_LOGGED) : header;
+    final StringBuilder escaped = new StringBuilder(shown.length());
+    for (int i = 0; i < shown.length(); i++) {
+      final char c = shown.charAt(i);
+      if (c == '\\') {
+        escaped.append("\\\\");
+      } else if (c < 0x20 || c == 0x7f) {
+        escaped.append(String.format("\\u%04x", (int) c));
+      } else {
+        escaped.append(c);
+      }
+    }
+    return truncated ? escaped.append("...(truncated)").toString() : escaped.toString();
+  }
+
   private static final DateTimeFormatter RFC_850_FORMATTER =
       DateTimeFormatter.ofPattern("[EEEE, ]d-MMM-yy H:m[:s] z");
   private static final DateTimeFormatter ASCTIME_FORMATTER =
