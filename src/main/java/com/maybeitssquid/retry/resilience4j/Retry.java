@@ -128,9 +128,12 @@ public interface Retry {
    *
    * <p><strong>CAUTION:</strong> The response may specify a {@code Retry-After} interval years in
    * the future. Skew between the local system clock and the clock on the service that generated the
-   * header also may produce unexpectedly long wait durations. Implementations that do not set a
-   * limit alternatively can defend against an unacceptable wait interval using e.g. a TimeLimiter
-   * to terminate excessive waits and a Bulkhead to prevent too many outstanding requests.
+   * header also may produce unexpectedly long wait durations. A delay too large to express is
+   * clamped to {@link com.maybeitssquid.retry.RetryAfterParser#MAX_DELAY}, so without a limit a
+   * single hostile or misconfigured response can park a retry effectively forever. Implementations
+   * that do not set a limit alternatively can defend against an unacceptable wait interval using
+   * e.g. a TimeLimiter to terminate excessive waits and a Bulkhead to prevent too many outstanding
+   * requests.
    *
    * @return consumer that uses Retry-After for retry waits.
    * @apiNote Apply after {@link RetryConfig.Builder#waitDuration(Duration)}; see the class

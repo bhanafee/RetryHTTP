@@ -285,9 +285,9 @@ public class RetryAfterParserTest {
   }
 
   /**
-   * A delay too large to express in milliseconds must be rejected rather than silently wrapped. The
-   * wrapped value defeated {@link LimitRetryAfter}, which read a multi-million-year delay as a
-   * duration short enough to allow an immediate retry.
+   * A delay too large to express in milliseconds must clamp to {@link RetryAfterParser#MAX_DELAY}
+   * rather than wrap. The wrapped value defeated {@link LimitRetryAfter}, which read a
+   * multi-million-year delay as a duration short enough to allow an immediate retry.
    */
   @ParameterizedTest
   @ValueSource(
@@ -296,11 +296,30 @@ public class RetryAfterParserTest {
         "99999999999999999999", // exceeds long entirely
         "18446744073709551.616" // wrapped to exactly zero before the fix
       })
-  void testOversizedDelayRejected(final String header) {
-    assertFalse(RetryAfterParser.STRICT_SECONDS.apply(header).isPresent());
-    assertFalse(RetryAfterParser.DECIMAL_SECONDS.apply(header).isPresent());
-    negativeTest(RetryAfterParser.secondsOnly(), header);
-    negativeTest(RetryAfterParser.extended(), header);
+  void testOversizedDelayClamped(final String header) {
+    // The strict parser accepts only digits, so it ignores the decimal case
+    if (!header.contains(".")) {
+      assertEquals(MAX_DELAY, STRICT_SECONDS.apply(header).orElseThrow());
+    }
+    assertEquals(MAX_DELAY, DECIMAL_SECONDS.apply(header).orElseThrow());
+
+    when(response.getHeader("Retry-After")).thenReturn(header);
+    assertEquals(MAX_DELAY, RetryAfterParser.extended().apply(response).orElseThrow());
+  }
+
+  /** A clamped delay must still convert to milliseconds without overflowing. */
+  @Test
+  void testClampedDelayConvertsToMillis() {
+    assertEquals(Long.MAX_VALUE, MAX_DELAY.toMillis());
+  }
+
+  /** An oversized delay must be refused by a limit, not allowed through it. */
+  @ParameterizedTest
+  @ValueSource(strings = {"9223372036854775807", "99999999999999999999", "18446744073709551.616"})
+  void testOversizedDelayBlockedByLimit(final String header) {
+    final LimitRetryAfter limiter = LimitRetryAfter.maximum(Duration.ofSeconds(30L));
+    when(response.getHeader("Retry-After")).thenReturn(header);
+    assertFalse(limiter.test(response));
   }
 
   /** Every duration the parser returns must survive conversion to milliseconds. */

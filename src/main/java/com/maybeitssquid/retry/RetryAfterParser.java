@@ -27,6 +27,16 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
   /** The {@code Retry-After} header name. */
   public static final String RETRY_AFTER_HEADER = "Retry-After";
 
+  /**
+   * The longest delay this parser will report. A server that asks for more than can be expressed in
+   * milliseconds is clamped to this rather than having the value wrap or be discarded, so the delay
+   * still exceeds any limit a caller has configured and the retry is refused rather than allowed.
+   */
+  public static final Duration MAX_DELAY = Duration.ofMillis(Long.MAX_VALUE);
+
+  /** {@link #MAX_DELAY} in milliseconds, for comparison before conversion. */
+  private static final BigDecimal MAX_MILLIS = BigDecimal.valueOf(Long.MAX_VALUE);
+
   private static final DateTimeFormatter RFC_850_FORMATTER =
       DateTimeFormatter.ofPattern("[EEEE, ]d-MMM-yy H:m[:s] z");
   private static final DateTimeFormatter ASCTIME_FORMATTER =
@@ -113,28 +123,51 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
    * href="https://datatracker.ietf.org/doc/html/rfc7231#section-7.1.3">RFC 7231</a> {@code
    * delay-seconds}.
    *
-   * <p>A delay too large to express in milliseconds is rejected rather than wrapped, so every
-   * {@link Duration} this parser returns is safe to pass to {@link Duration#toMillis()}.
+   * <p>A delay too large to express in milliseconds is clamped to {@link #MAX_DELAY} rather than
+   * wrapped or discarded, so every {@link Duration} this parser returns is safe to pass to {@link
+   * Duration#toMillis()} and still exceeds any sane limit.
    */
   public static final Function<String, Optional<Duration>> STRICT_SECONDS =
-      new PatternGuarded<>(
-          "^\\d+$", h -> Duration.ofMillis(Math.multiplyExact(Long.parseLong(h), 1000L)));
+      new PatternGuarded<>("^\\d+$", RetryAfterParser::strictSeconds);
 
   /**
    * Accept extended {@code Retry-After} header that allows decimal seconds.
    *
-   * <p>Precision finer than a millisecond is truncated. A delay too large to express in
-   * milliseconds is rejected rather than wrapped, matching {@link #STRICT_SECONDS}.
+   * <p>Precision finer than a millisecond is truncated, and an oversized delay is clamped to {@link
+   * #MAX_DELAY}, matching {@link #STRICT_SECONDS}.
    */
   public static final Function<String, Optional<Duration>> DECIMAL_SECONDS =
-      new PatternGuarded<>(
-          "^\\d+(\\.\\d*)?$",
-          h ->
-              Duration.ofMillis(
-                  new BigDecimal(h)
-                      .movePointRight(3)
-                      .setScale(0, RoundingMode.DOWN)
-                      .longValueExact()));
+      new PatternGuarded<>("^\\d+(\\.\\d*)?$", h -> clamped(new BigDecimal(h)));
+
+  /**
+   * Converts an integer number of seconds to a duration, clamping a delay too large to express in
+   * milliseconds.
+   *
+   * @param header the delay in seconds, already known to contain only digits.
+   * @return the delay, clamped to {@link #MAX_DELAY}.
+   */
+  private static Duration strictSeconds(final String header) {
+    try {
+      return Duration.ofMillis(Math.multiplyExact(Long.parseLong(header), 1000L));
+    } catch (final ArithmeticException | NumberFormatException tooLarge) {
+      // The guard pattern admits only digits, so the only way to get here is a value too large
+      return MAX_DELAY;
+    }
+  }
+
+  /**
+   * Converts a decimal number of seconds to a duration, truncating precision finer than a
+   * millisecond and clamping a delay too large to express.
+   *
+   * @param seconds the delay in seconds.
+   * @return the delay, clamped to {@link #MAX_DELAY}.
+   */
+  private static Duration clamped(final BigDecimal seconds) {
+    final BigDecimal millis = seconds.movePointRight(3).setScale(0, RoundingMode.DOWN);
+    return millis.compareTo(MAX_MILLIS) >= 0
+        ? MAX_DELAY
+        : Duration.ofMillis(millis.longValueExact());
+  }
 
   /**
    * Forgiving parser for a superset of IMF-fixdate using the builtin {@link
