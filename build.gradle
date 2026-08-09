@@ -21,6 +21,19 @@ repositories {
     mavenCentral()
 }
 
+// Dynamic version ranges otherwise resolve to prereleases; slf4j "2.+" picks up 2.1.0-alpha1.
+// A version is stable if it is digits and separators only, optionally with the jgit-style "-r"
+// suffix, or is explicitly marked RELEASE, FINAL, or GA. Everything else is a prerelease.
+configurations.all {
+    resolutionStrategy.componentSelection.all { selection ->
+        final String candidate = selection.candidate.version
+        final boolean stable = ['RELEASE', 'FINAL', 'GA'].any { candidate.toUpperCase().contains(it) }
+        if (!stable && !(candidate ==~ /^[0-9,.v-]+(-r)?$/)) {
+            selection.reject('prerelease version')
+        }
+    }
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(libs.versions.java.get())
