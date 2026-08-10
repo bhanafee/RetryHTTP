@@ -1,1 +1,0 @@
-{"nodes": [{"id": "workflows_pages_deployment", "label": "GitHub Pages deployment workflow", "file_type": "rationale", "source_file": ".github/workflows/pages.yml", "source_location": "Lines 1-95"}], "edges": [], "hyperedges": []}
