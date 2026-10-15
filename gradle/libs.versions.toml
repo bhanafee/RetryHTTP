@@ -6,16 +6,16 @@ release = "17"
 # Plugin versions
 git-version = "5.1.0"
 spotless = "8.+"
-owasp-dependencycheck = "12.+"
+owasp-dependencycheck = "13.+"
 
 # Logging
 slf4j = "2.+"
 
 # Web / Servlet
-servlet-api = "6.1+"
+servlet-api = "6.1.+"
 
 # Resilience
-resilience4j = "2+"
+resilience4j = "2.+"
 
 # Testing
 junit = { strictly = "[5,)", prefer = "5.12.+" }
@@ -51,7 +51,6 @@ mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.
 
 [bundles]
 security-patches = ["patch-cve-2022-45868", "patch-cve-2025-48924", "patch-cve-2025-4949", "patch-cve-2026-54399", "patch-cve-2026-54428", "patch-cve-2026-71290", "patch-cve-2026-75140", "patch-cve-2026-89407", "patch-cve-2026-91776"]
-mockito = ["mockito-core", "mockito-junit-jupiter"]
 
 [plugins]
 git-version = { id = "com.palantir.git-version", version.ref = "git-version" }
