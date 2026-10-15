@@ -58,10 +58,15 @@ dependencies {
 
 testing {
     suites.test {
-        useJUnitJupiter(libs.versions.junit)
+        // Every JUnit module's version comes from the JUnit BOM, as the Spring projects take theirs from
+        // the Spring Boot BOM. useJUnitJupiter() also declares Gradle's default Jupiter version, which is
+        // older, so the BOM's version wins.
+        useJUnitJupiter()
         dependencies {
+            implementation platform(libs.junit.bom)
             implementation libs.mockito.core
             implementation libs.mockito.junit.jupiter
+            runtimeOnly libs.junit.platform.launcher
         }
     }
 }

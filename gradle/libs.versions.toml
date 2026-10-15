@@ -18,7 +18,7 @@ servlet-api = "6.1.+"
 resilience4j = "2.+"
 
 # Testing
-junit = { strictly = "[5,)", prefer = "5.12.+" }
+junit = "6.+"
 mockito = "5.+"
 
 [libraries]
@@ -48,6 +48,10 @@ jakarta-servlet-api = { module = "jakarta.servlet:jakarta.servlet-api", version.
 resilience4j-retry = { module = "io.github.resilience4j:resilience4j-retry", version.ref = "resilience4j" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
+
+# Testing - JUnit (module versions from junit-bom)
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 
 [bundles]
 security-patches = ["patch-cve-2022-45868", "patch-cve-2025-48924", "patch-cve-2025-4949", "patch-cve-2026-54399", "patch-cve-2026-54428", "patch-cve-2026-71290", "patch-cve-2026-75140", "patch-cve-2026-89407", "patch-cve-2026-91776"]
