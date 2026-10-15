@@ -28,16 +28,20 @@ patch-cve-2025-48924 = { module = "org.apache.commons:commons-lang3", version = 
 # Security patches - Other
 patch-cve-2022-45868 = { module = "com.h2database:h2", version = { strictly = "[2.2.220,)", prefer = "2.2.220" } }
 patch-cve-2025-4949 = { module = "org.eclipse.jgit:org.eclipse.jgit", version = { strictly = "[6.10.1.202505221210-r,)", prefer = "6.10.1.202505221210-r" } }
-patch-ghsa-dcmj-56c4-q8dh = { module = "org.jsoup:jsoup", version = { strictly = "[1.23.1,)", prefer = "1.23.1" } }
-# jackson 2.22.1: core fixes GHSA-72hv-8253-57qq; databind fixes GHSA-5jmj-h7xm-6q6v.
+# jsoup 1.23.2 fixes CVE-2026-75140; supersedes the 1.23.1 pin for GHSA-dcmj-56c4-q8dh.
+patch-cve-2026-75140 = { module = "org.jsoup:jsoup", version = { strictly = "[1.23.2,)", prefer = "1.23.2" } }
+# jackson 2.22.3: core fixes CVE-2026-89407 and CVE-2026-89425; databind fixes CVE-2026-91776,
+# CVE-2026-91777, CVE-2026-68497, CVE-2026-83557 and CVE-2026-19032. Supersedes the 2.22.1 pins
+# for GHSA-72hv-8253-57qq, GHSA-5jmj-h7xm-6q6v.
 # Keep core and databind aligned to avoid mixing across major version boundaries.
-patch-ghsa-72hv-8253-57qq = { module = "com.fasterxml.jackson.core:jackson-core", version = { strictly = "[2.22.1,)", prefer = "2.22.1" } }
-patch-ghsa-5jmj-h7xm-6q6v = { module = "com.fasterxml.jackson.core:jackson-databind", version = { strictly = "[2.22.1,)", prefer = "2.22.1" } }
+patch-cve-2026-89407 = { module = "com.fasterxml.jackson.core:jackson-core", version = { strictly = "[2.22.3,)", prefer = "2.22.3" } }
+patch-cve-2026-91776 = { module = "com.fasterxml.jackson.core:jackson-databind", version = { strictly = "[2.22.3,)", prefer = "2.22.3" } }
 
 # Security patches - Apache HttpComponents (DoS vulnerabilities)
 patch-cve-2026-54428 = { module = "org.apache.httpcomponents.core5:httpcore5-h2", version = { strictly = "[5.4.3,)", prefer = "5.4.3" } }
 patch-cve-2026-54399 = { module = "org.apache.httpcomponents.core5:httpcore5", version = { strictly = "[5.4.3,)", prefer = "5.4.3" } }
-patch-cve-2026-64607 = { module = "org.apache.httpcomponents.client5:httpclient5", version = { strictly = "[5.6.3,)", prefer = "5.6.3" } }
+# httpclient5 5.6.4 fixes CVE-2026-71290 (async client ignores hostname verification); supersedes the 5.6.3 pin for CVE-2026-64607.
+patch-cve-2026-71290 = { module = "org.apache.httpcomponents.client5:httpclient5", version = { strictly = "[5.6.4,)", prefer = "5.6.4" } }
 
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 jakarta-servlet-api = { module = "jakarta.servlet:jakarta.servlet-api", version.ref = "servlet-api" }
@@ -46,7 +50,7 @@ mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
 
 [bundles]
-security-patches = ["patch-cve-2022-45868", "patch-cve-2025-4949", "patch-cve-2025-48924", "patch-cve-2026-54399", "patch-cve-2026-54428", "patch-cve-2026-64607", "patch-ghsa-72hv-8253-57qq", "patch-ghsa-5jmj-h7xm-6q6v", "patch-ghsa-dcmj-56c4-q8dh"]
+security-patches = ["patch-cve-2022-45868", "patch-cve-2025-48924", "patch-cve-2025-4949", "patch-cve-2026-54399", "patch-cve-2026-54428", "patch-cve-2026-71290", "patch-cve-2026-75140", "patch-cve-2026-89407", "patch-cve-2026-91776"]
 mockito = ["mockito-core", "mockito-junit-jupiter"]
 
 [plugins]
