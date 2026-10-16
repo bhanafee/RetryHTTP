@@ -225,7 +225,7 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
           h -> ZonedDateTime.parse(h, DateTimeFormatter.RFC_1123_DATE_TIME));
 
   /**
-   * Forgiving parer for a superset of RFC-850 dates.
+   * Forgiving parser for a superset of RFC-850 dates.
    *
    * <p>Example: "Thursday, 02-Jan-03 01:23:45 GMT"
    */
@@ -235,7 +235,7 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
           h -> ZonedDateTime.parse(h, RFC_850_FORMATTER));
 
   /**
-   * Forgiving parer for a superset of ASCTIME dates.
+   * Forgiving parser for a superset of ASCTIME dates.
    *
    * <p>Example: "Thu Jan 2 01:23:45 2003"
    */
