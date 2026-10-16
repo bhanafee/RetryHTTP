@@ -22,7 +22,7 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
   private final Function<String, Optional<Duration>>[] parsers;
 
   /** Logger for errors during parsing, particularly to diagnose a misbehaving server. */
-  public static final Logger LOGGER = LoggerFactory.getLogger(RetryAfterParser.class);
+  private final Logger logger;
 
   /** The {@code Retry-After} header name. */
   public static final String RETRY_AFTER_HEADER = "Retry-After";
@@ -79,6 +79,16 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
   @SafeVarargs
   private RetryAfterParser(final Function<String, Optional<Duration>>... parsers) {
     this.parsers = parsers;
+    this.logger = LoggerFactory.getLogger(RetryAfterParser.class);
+  }
+
+  /**
+   * Returns the logger this parser writes to.
+   *
+   * @return the logger used to report malformed {@code Retry-After} headers.
+   */
+  public Logger getLogger() {
+    return logger;
   }
 
   /**
@@ -266,19 +276,33 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
 
     final String header = rawHeader.trim();
     if (header.isEmpty()) {
-      LOGGER.warn("Received empty Retry-After header \"{}\"", forLog(rawHeader));
+      logger
+          .atWarn()
+          .addArgument(() -> forLog(rawHeader))
+          .log("Received empty Retry-After header \"{}\"");
       return Optional.empty();
     }
 
     // Return the result of the first successful parse
     for (final Function<String, Optional<Duration>> parser : parsers) {
-      final Optional<Duration> retryAfter = parser.apply(header);
-      if (retryAfter.isPresent()) {
-        return retryAfter;
+      try {
+        final Optional<Duration> retryAfter = parser.apply(header);
+        if (retryAfter.isPresent()) {
+          return retryAfter;
+        }
+      } catch (final RuntimeException e) {
+        logger
+            .atWarn()
+            .addArgument(() -> forLog(header))
+            .setCause(e)
+            .log("Failed to parse Retry-After header \"{}\"");
       }
     }
 
-    LOGGER.warn("Received unrecognized Retry-After header \"{}\"", forLog(rawHeader));
+    logger
+        .atWarn()
+        .addArgument(() -> forLog(rawHeader))
+        .log("Received unrecognized Retry-After header \"{}\"");
     return Optional.empty();
   }
 
@@ -319,14 +343,7 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
 
     @Override
     public Optional<T> apply(final String header) {
-      try {
-        return guard.matcher(header).matches()
-            ? Optional.of(parser.apply(header))
-            : Optional.empty();
-      } catch (final RuntimeException e) {
-        LOGGER.warn("Failed to parse Retry-After header \"{}\"", forLog(header), e);
-        return Optional.empty();
-      }
+      return guard.matcher(header).matches() ? Optional.of(parser.apply(header)) : Optional.empty();
     }
   }
 }
