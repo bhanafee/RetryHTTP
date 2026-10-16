@@ -240,7 +240,7 @@ constructors directly to supply a custom parser.
 When the `Retry-After` header specifies a time, the client has to convert it into a wait interval.
 To do this, it requires a clock. By default, it uses the clock supplied by `InstantSource.system()`.
 A different source can be supplied when the parser is initialized via
-`RetryAfterParser.strict(InstantSource)` or `RetryAfterParser.extended(InstantSource)`.
+`RetryAfterParser.strict(Logger, InstantSource)` or `RetryAfterParser.extended(Logger, InstantSource)`.
 
 #### Expanded headers
 
@@ -264,9 +264,14 @@ classDiagram
     class RetryAfterParser {
         <<Function — returns Optional~Duration~>>
         +strict() RetryAfterParser
+        +strict(Logger, InstantSource) RetryAfterParser
         +extended() RetryAfterParser
+        +extended(Logger, InstantSource) RetryAfterParser
         +secondsOnly() RetryAfterParser
+        +secondsOnly(Logger) RetryAfterParser
         +decimalSeconds() RetryAfterParser
+        +decimalSeconds(Logger) RetryAfterParser
+        +getLogger() Logger
         +apply(HttpServletResponse) Optional~Duration~
     }
 

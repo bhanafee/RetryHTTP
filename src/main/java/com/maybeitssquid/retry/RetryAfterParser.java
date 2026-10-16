@@ -76,10 +76,28 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
   private static final DateTimeFormatter ASCTIME_FORMATTER =
       DateTimeFormatter.ofPattern("[E ]MMM [ ]d H:m[:s] yyyy");
 
+  /**
+   * Creates a parser that logs to this class's default logger.
+   *
+   * @param parsers the parsers to try, in order.
+   */
   @SafeVarargs
   private RetryAfterParser(final Function<String, Optional<Duration>>... parsers) {
+    this(null, parsers);
+  }
+
+  /**
+   * Creates a parser that logs to the given logger.
+   *
+   * @param logger the logger for malformed {@code Retry-After} headers, or {@code null} for this
+   *     class's default logger.
+   * @param parsers the parsers to try, in order.
+   */
+  @SafeVarargs
+  private RetryAfterParser(
+      final Logger logger, final Function<String, Optional<Duration>>... parsers) {
+    this.logger = logger == null ? LoggerFactory.getLogger(RetryAfterParser.class) : logger;
     this.parsers = parsers;
-    this.logger = LoggerFactory.getLogger(RetryAfterParser.class);
   }
 
   /**
@@ -95,33 +113,61 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
    * Parser that accepts only {@code Retry-After} headers with an integer number of seconds to wait.
    * If the header contains some other value, such as a date, it is ignored.
    *
+   * @param logger the logger for malformed headers.
+   * @return Parser that accepts only {@code delay-seconds} in the {@code Retry-After} header.
+   */
+  public static RetryAfterParser secondsOnly(final Logger logger) {
+    return new RetryAfterParser(logger, STRICT_SECONDS);
+  }
+
+  /**
+   * Parser that accepts only {@code Retry-After} headers with an integer number of seconds to wait,
+   * logging to the default logger.
+   *
    * @return Parser that accepts only {@code delay-seconds} in the {@code Retry-After} header.
    */
   public static RetryAfterParser secondsOnly() {
-    return new RetryAfterParser(STRICT_SECONDS);
+    return secondsOnly(null);
   }
 
   /**
    * Parser that accepts {@code Retry-After} headers with a potentially decimal number of seconds to
    * wait. If the header contains some other value, such as a date, it is ignored.
    *
+   * @param logger the logger for malformed headers.
+   * @return Parser that accepts only seconds in the {@code Retry-After} header.
+   */
+  public static RetryAfterParser decimalSeconds(final Logger logger) {
+    // Attempt STRICT_SECONDS first, because the DECIMAL_SECONDS parse is expensive
+    return new RetryAfterParser(logger, STRICT_SECONDS, DECIMAL_SECONDS);
+  }
+
+  /**
+   * Parser that accepts {@code Retry-After} headers with a potentially decimal number of seconds to
+   * wait, logging to the default logger. If the header contains some other value, such as a date,
+   * it is ignored.
+   *
    * @return Parser that accepts only seconds in the {@code Retry-After} header.
    */
   public static RetryAfterParser decimalSeconds() {
-    // Attempt STRICT_SECONDS first, because the DECIMAL_SECONDS parse is expensive
-    return new RetryAfterParser(STRICT_SECONDS, DECIMAL_SECONDS);
+    return decimalSeconds(null);
   }
 
   /**
    * Parser that accepts only {@code Retry-After} headers that meet a reasonably strict
    * interpretation of RFC-9110.
    *
+   * @param logger the logger for malformed headers.
    * @param clock the clock to use to compute offsets when the header is a date. Useful for testing.
    * @return Parser for RFC-9110 {@code Retry-After} headers.
    */
-  public static RetryAfterParser strict(final InstantSource clock) {
+  public static RetryAfterParser strict(final Logger logger, final InstantSource clock) {
     return new RetryAfterParser(
-        STRICT_SECONDS, wait(clock, IMF_FIXDATE), wait(clock, RFC_850), wait(clock, ASCTIME));
+        logger,
+        STRICT_SECONDS,
+        wait(clock, IMF_FIXDATE),
+        wait(clock, RFC_850),
+        wait(clock, ASCTIME));
   }
 
   /**
@@ -131,18 +177,20 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
    * @return Parser for RFC-9110 {@code Retry-After} headers.
    */
   public static RetryAfterParser strict() {
-    return strict(InstantSource.system());
+    return strict(null, InstantSource.system());
   }
 
   /**
    * Parser that accepts {@code Retry-After} headers that meet a superset of RFC-9110, including
    * headers with a decimal number of seconds delay and ISO-8601 instants.
    *
+   * @param logger the logger for malformed headers.
    * @param clock the clock to use to compute offsets when the header is a date. Useful for testing.
    * @return Parser for extended {@code Retry-After} headers.
    */
-  public static RetryAfterParser extended(final InstantSource clock) {
+  public static RetryAfterParser extended(final Logger logger, final InstantSource clock) {
     return new RetryAfterParser(
+        logger,
         STRICT_SECONDS,
         DECIMAL_SECONDS,
         wait(clock, IMF_FIXDATE),
@@ -159,7 +207,7 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
    * @return Parser for extended {@code Retry-After} headers.
    */
   public static RetryAfterParser extended() {
-    return extended(InstantSource.system());
+    return extended(null, InstantSource.system());
   }
 
   /**

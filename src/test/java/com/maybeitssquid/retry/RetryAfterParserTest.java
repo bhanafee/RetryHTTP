@@ -188,7 +188,7 @@ public class RetryAfterParserTest {
     final Duration EXPECTED = Duration.ofSeconds(1);
     // Set the parser clock to a fixed time EXPECTED seconds after TEST_INSTANT
     final RetryAfterParser parser =
-        RetryAfterParser.strict(InstantSource.fixed(TEST_INSTANT.plus(EXPECTED)));
+        RetryAfterParser.strict(null, InstantSource.fixed(TEST_INSTANT.plus(EXPECTED)));
 
     when(response.getHeader("Retry-After")).thenReturn("Thu, 02 Jan 2003 01:23:45 GMT");
     final Optional<Duration> result = parser.apply(response);
@@ -208,7 +208,7 @@ public class RetryAfterParserTest {
     final Duration EXPECTED = Duration.ofSeconds(1);
     // Set the parser clock to a fixed time EXPECTED seconds before TEST_INSTANT
     final RetryAfterParser parser =
-        RetryAfterParser.strict(InstantSource.fixed(TEST_INSTANT.minus(EXPECTED)));
+        RetryAfterParser.strict(null, InstantSource.fixed(TEST_INSTANT.minus(EXPECTED)));
 
     when(response.getHeader("Retry-After")).thenReturn(header);
     final Optional<Duration> result = parser.apply(response);
@@ -251,7 +251,7 @@ public class RetryAfterParserTest {
     final Duration EXPECTED = Duration.ofSeconds(1);
     // Set the parser clock to a fixed time EXPECTED seconds before TEST_INSTANT
     final RetryAfterParser parser =
-        RetryAfterParser.extended(InstantSource.fixed(TEST_INSTANT.minus(EXPECTED)));
+        RetryAfterParser.extended(null, InstantSource.fixed(TEST_INSTANT.minus(EXPECTED)));
 
     when(response.getHeader("Retry-After")).thenReturn(header);
     final Optional<Duration> result = parser.apply(response);
