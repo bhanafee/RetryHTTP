@@ -77,16 +77,6 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
       DateTimeFormatter.ofPattern("[E ]MMM [ ]d H:m[:s] yyyy");
 
   /**
-   * Creates a parser that logs to this class's default logger.
-   *
-   * @param parsers the parsers to try, in order.
-   */
-  @SafeVarargs
-  private RetryAfterParser(final Function<String, Optional<Duration>>... parsers) {
-    this(null, parsers);
-  }
-
-  /**
    * Creates a parser that logs to the given logger.
    *
    * @param logger the logger for malformed {@code Retry-After} headers, or {@code null} for this
