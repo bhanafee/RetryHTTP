@@ -1,12 +1,18 @@
 package com.maybeitssquid.retry;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -33,59 +39,83 @@ public class RetryStatusCodesTest {
     assertTrue(predicate.test(response)); // OK
   }
 
-  void testCommon(final RetryStatusCodes predicate) {
-    // Out of range
-    assertFalse(predicate.retries(-1));
-    assertFalse(predicate.retries(0));
-    assertFalse(predicate.retries(1));
-    assertFalse(predicate.retries(99));
-    assertFalse(predicate.retries(600));
-    assertFalse(predicate.retries(Integer.MAX_VALUE));
-    assertFalse(predicate.retries(Integer.MIN_VALUE));
+  /**
+   * Behavior shared by every predicate, whatever its 5xx policy. Arrays.fill excludes its end
+   * index, so the range endpoints (199, 399) were previously missed.
+   */
+  static Stream<Arguments> commonStatuses() {
+    return Stream.of(
+        // Out of range
+        Arguments.of(-1, false),
+        Arguments.of(0, false),
+        Arguments.of(1, false),
+        Arguments.of(99, false),
+        Arguments.of(600, false),
+        Arguments.of(Integer.MAX_VALUE, false),
+        Arguments.of(Integer.MIN_VALUE, false),
+        // Continue, and the 1xx range endpoints
+        Arguments.of(100, true),
+        Arguments.of(199, true),
+        // 2xx and 3xx
+        Arguments.of(200, false), // OK
+        Arguments.of(302, true), // Moved temporarily
+        Arguments.of(399, true), // last 3xx
+        // 4xx and 5xx not covered by the 5xx policy
+        Arguments.of(404, false), // Not found
+        Arguments.of(501, false), // Not implemented
+        Arguments.of(505, false)); // HTTP version not supported
+  }
 
-    assertTrue(predicate.retries(100)); // Continue
-    // Range endpoints: Arrays.fill excludes its end index, so these were previously missed
-    assertTrue(predicate.retries(199)); // last 1xx
-    assertTrue(predicate.retries(399)); // last 3xx
-    assertFalse(predicate.retries(200)); // OK
-    assertTrue(predicate.retries(302)); // Moved temporarily
-    assertFalse(predicate.retries(404)); // Not found
-    assertFalse(predicate.retries(501)); // Not implemented
-    assertFalse(predicate.retries(505)); // HTTP version not supported
+  @ParameterizedTest
+  @MethodSource("commonStatuses")
+  void idempotentCommon(final int status, final boolean retries) {
+    assertCommon(RetryStatusCodes.idempotent(), status, retries);
+  }
+
+  @ParameterizedTest
+  @MethodSource("commonStatuses")
+  void nonIdempotentCommon(final int status, final boolean retries) {
+    assertCommon(RetryStatusCodes.nonIdempotent(), status, retries);
+  }
+
+  // Pathology forcing varargs to null
+  @ParameterizedTest
+  @MethodSource("commonStatuses")
+  void idempotentNullVarArgsCommon(final int status, final boolean retries) {
+    assertCommon(RetryStatusCodes.idempotent((int[]) null), status, retries);
+  }
+
+  @ParameterizedTest
+  @MethodSource("commonStatuses")
+  void nonIdempotentNullVarArgsCommon(final int status, final boolean retries) {
+    assertCommon(RetryStatusCodes.nonIdempotent((int[]) null), status, retries);
+  }
+
+  private static void assertCommon(
+      final RetryStatusCodes predicate, final int status, final boolean retries) {
+    assertEquals(retries, predicate.retries(status), () -> "retries(" + status + ")");
+  }
+
+  @ParameterizedTest
+  @ValueSource(ints = {500, 503, 599}) // Internal server error, service unavailable, last 5xx
+  void idempotentRetriesServerErrors(final int status) {
+    assertTrue(RetryStatusCodes.idempotent().retries(status));
+  }
+
+  @ParameterizedTest
+  @ValueSource(ints = {500, 503, 599}) // Internal server error, service unavailable, last 5xx
+  void nonIdempotentDoesNotRetryServerErrors(final int status) {
+    assertFalse(RetryStatusCodes.nonIdempotent().retries(status));
   }
 
   @Test
-  void testIdempotent() {
-    final RetryStatusCodes idempotent = RetryStatusCodes.idempotent();
-    testCommon(idempotent);
-
-    assertTrue(idempotent.retries(500)); // Internal server error
-    assertTrue(idempotent.retries(503)); // Service unavailable
-    assertTrue(idempotent.retries(599)); // last 5xx
-
-    // Override to retry "not implemented"
+  void idempotentOverrideRetriesNotImplemented() {
     assertTrue(RetryStatusCodes.idempotent(501).retries(501));
-
-    // Pathology forcing varargs to null
-    final RetryStatusCodes badVarArgs = RetryStatusCodes.idempotent((int[]) null);
-    testCommon(badVarArgs);
   }
 
   @Test
-  void testNonIdempotent() {
-    final RetryStatusCodes nonIdempotent = RetryStatusCodes.nonIdempotent();
-    testCommon(nonIdempotent);
-
-    assertFalse(nonIdempotent.retries(500)); // Internal server error
-    assertFalse(nonIdempotent.retries(503)); // Service unavailable
-    assertFalse(nonIdempotent.retries(599)); // last 5xx
-
-    // Override to retry "not implemented"
+  void nonIdempotentOverrideRetriesNotImplemented() {
     assertTrue(RetryStatusCodes.nonIdempotent(501).retries(501));
-
-    // Pathology forcing varargs to null
-    final RetryStatusCodes badVarArgs = RetryStatusCodes.nonIdempotent((int[]) null);
-    testCommon(badVarArgs);
   }
 
   @Test
