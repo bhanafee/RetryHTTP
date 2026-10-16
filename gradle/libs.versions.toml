@@ -22,12 +22,7 @@ junit = "6.+"
 mockito = "5.+"
 
 [libraries]
-# Security patches - Apache Commons
-patch-cve-2025-48924 = { module = "org.apache.commons:commons-lang3", version = { strictly = "[3.18.0,)", prefer = "3.18.0" } }
-
 # Security patches - Other
-patch-cve-2022-45868 = { module = "com.h2database:h2", version = { strictly = "[2.2.220,)", prefer = "2.2.220" } }
-patch-cve-2025-4949 = { module = "org.eclipse.jgit:org.eclipse.jgit", version = { strictly = "[6.10.1.202505221210-r,)", prefer = "6.10.1.202505221210-r" } }
 # jsoup 1.23.2 fixes CVE-2026-75140; supersedes the 1.23.1 pin for GHSA-dcmj-56c4-q8dh.
 patch-cve-2026-75140 = { module = "org.jsoup:jsoup", version = { strictly = "[1.23.2,)", prefer = "1.23.2" } }
 # jackson 2.22.3: core fixes CVE-2026-89407 and CVE-2026-89425; databind fixes CVE-2026-91776,
@@ -54,7 +49,7 @@ junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 
 [bundles]
-security-patches = ["patch-cve-2022-45868", "patch-cve-2025-48924", "patch-cve-2025-4949", "patch-cve-2026-54399", "patch-cve-2026-54428", "patch-cve-2026-71290", "patch-cve-2026-75140", "patch-cve-2026-89407", "patch-cve-2026-91776"]
+security-patches = ["patch-cve-2026-54399", "patch-cve-2026-54428", "patch-cve-2026-71290", "patch-cve-2026-75140", "patch-cve-2026-89407", "patch-cve-2026-91776"]
 
 [plugins]
 git-version = { id = "com.palantir.git-version", version.ref = "git-version" }
