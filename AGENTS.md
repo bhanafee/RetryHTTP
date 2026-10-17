@@ -4,7 +4,7 @@ This file documents key information about the project architecture, build comman
 
 ## Project overview
 
-RetryHTTP is a Java library that adds HTTP-awareness to [Resilience4j](https://resilience4j.readme.io). It provides `Predicate<HttpServletResponse>` and `IntervalBiFunction<HttpServletResponse>` implementations that make retry decisions based on HTTP status codes and `Retry-After` response headers, operating on `jakarta.servlet.http.HttpServletResponse`. Published to GitHub Packages as `com.maybeitssquid:RetryHTTP`.
+RetryHTTP is a Java library that adds HTTP-awareness to [Resilience4j](https://resilience4j.readme.io). It provides `Predicate<HttpServletResponse>` and `IntervalBiFunction<HttpServletResponse>` implementations that make retry decisions based on HTTP status codes and `Retry-After` response headers, operating on `jakarta.servlet.http.HttpServletResponse`. Published to GitHub Packages as `com.maybeitssquid:retry-http`.
 
 ## Commands
 
@@ -47,17 +47,34 @@ Two packages:
 - `Retry` — factory for wiring into `RetryConfig`
 - `HeedRetryAfter` — extends wait to honor `Retry-After` header
 
-## Versioning
+## Versioning and Releases
 
-Release versions are derived automatically from git tags using [Palantir's gradle-git-version plugin](https://github.com/palantir/gradle-git-version). The plugin inspects the git repository and generates a version string. Tag names should use the format `v<major>.<minor>.<patch>` (e.g., `v1.0.0`); the `v` prefix is stripped in the published version.
+Versions are derived from git tags using [`gradle-git-version`](https://github.com/palantir/gradle-git-version):
 
-To cut a release:
+- **On a tag** (e.g., `v1.0.0`) → version = `1.0.0`
+- **After a tag** → version = tag + distance + commit hash (e.g., `1.0.1-3-gABC1234` = 3 commits after v1.0.0)
+- **No tags yet** → version synthesized from git history (e.g., `0.0.1-dev-88-gXYZ`)
+
+**To create a release:**
+
 ```bash
-git tag v1.0.0
+# Ensure all commits are pushed
+git push origin main
+
+# Create and push the tag (triggers automatic version picking in build)
+git tag -a v1.0.0 -m "Release 1.0.0"
 git push origin v1.0.0
+
+# Build and publish
+./gradlew clean build publish
 ```
 
-The version is automatically picked up by the build and used in published artifacts.
+**To delete a release tag:**
+
+```bash
+git tag -d v1.0.0              # Delete locally
+git push origin :v1.0.0        # Delete from remote
+```
 
 ## Shared build sections
 
