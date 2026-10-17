@@ -65,8 +65,8 @@ git push origin main
 git tag -a v1.0.0 -m "Release 1.0.0"
 git push origin v1.0.0
 
-# Build and publish
-./gradlew clean build publish
+# Publish the GitHub Release; gradle-publish.yml publishes to GitHub Packages
+gh release create v1.0.0 --title "v1.0.0" --generate-notes
 ```
 
 **To delete a release tag:**
