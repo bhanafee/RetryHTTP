@@ -25,6 +25,7 @@ repositories {
 // Match known prerelease qualifiers rather than allowlisting stable ones. Stable releases carry
 // odd suffixes — 0.0.20131108.vaadin1 and 2.3.1-b170201.1204 are both stable — and an allowlist
 // rejects them, breaking resolution of transitive dependencies.
+// shared:begin build
 configurations.all {
     resolutionStrategy.componentSelection.all { selection ->
         if (selection.candidate.version ==~ /(?i).*[.\-](alpha|beta|rc|cr|snapshot|preview|dev|milestone|m\d+)[.\-]?\d*$/) {
@@ -51,44 +52,8 @@ dependencies {
             add('implementation', it)
         }
     }
-    // The public API exposes these types (HttpServletResponse, Logger, IntervalBiFunction), so consumers
-    // need them on their compile classpath.
-    api libs.slf4j.api
-    api libs.jakarta.servlet.api
-    api libs.resilience4j.retry
 }
 
-testing {
-    suites.test {
-        // Every JUnit module's version comes from the JUnit BOM, as the Spring projects take theirs from
-        // the Spring Boot BOM. useJUnitJupiter() also declares Gradle's default Jupiter version, which is
-        // older, so the BOM's version wins.
-        useJUnitJupiter()
-        dependencies {
-            implementation platform(libs.junit.bom)
-            implementation libs.mockito.core
-            implementation libs.mockito.junit.jupiter
-            runtimeOnly libs.junit.platform.launcher
-        }
-
-        // Tests run on the JDK named by -PtestJava (CI passes each matrix version); without it, on the
-        // toolchain. Compilation always uses the toolchain, targeting the release version.
-        targets.configureEach {
-            testTask.configure {
-                javaLauncher = javaToolchains.launcherFor {
-                    languageVersion = providers.gradleProperty('testJava')
-                            .orElse(libs.versions.java)
-                            .map { JavaLanguageVersion.of(it) }
-                }
-                // Log the test JVM so each CI job shows which Java its tests ran on.
-                doFirst { task ->
-                    def jvm = task.javaLauncher.get().metadata
-                    task.logger.lifecycle("Tests run on Java ${jvm.javaRuntimeVersion} (${jvm.vendor}, ${jvm.installationPath})")
-                }
-            }
-        }
-    }
-}
 
 tasks.named('jacocoTestReport') {
     dependsOn tasks.named('test')
@@ -140,6 +105,47 @@ tasks.withType(Javadoc).configureEach {
                 'implSpec:a:Implementation Requirements:',
                 'implNote:a:Implementation Note:'
         )
+    }
+}
+// shared:end build
+
+// The public API exposes these types (HttpServletResponse, Logger, IntervalBiFunction), so consumers
+// need them on their compile classpath.
+dependencies {
+    api libs.slf4j.api
+    api libs.jakarta.servlet.api
+    api libs.resilience4j.retry
+}
+
+testing {
+    suites.test {
+        // Every JUnit module's version comes from the JUnit BOM, as the Spring projects take theirs from
+        // the Spring Boot BOM. useJUnitJupiter() also declares Gradle's default Jupiter version, which is
+        // older, so the BOM's version wins.
+        useJUnitJupiter()
+        dependencies {
+            implementation platform(libs.junit.bom)
+            implementation libs.mockito.core
+            implementation libs.mockito.junit.jupiter
+            runtimeOnly libs.junit.platform.launcher
+        }
+
+        // Tests run on the JDK named by -PtestJava (CI passes each matrix version); without it, on the
+        // toolchain. Compilation always uses the toolchain, targeting the release version.
+        targets.configureEach {
+            testTask.configure {
+                javaLauncher = javaToolchains.launcherFor {
+                    languageVersion = providers.gradleProperty('testJava')
+                            .orElse(libs.versions.java)
+                            .map { JavaLanguageVersion.of(it) }
+                }
+                // Log the test JVM so each CI job shows which Java its tests ran on.
+                doFirst { task ->
+                    def jvm = task.javaLauncher.get().metadata
+                    task.logger.lifecycle("Tests run on Java ${jvm.javaRuntimeVersion} (${jvm.vendor}, ${jvm.installationPath})")
+                }
+            }
+        }
     }
 }
 
