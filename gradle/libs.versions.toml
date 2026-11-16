@@ -51,8 +51,11 @@ mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 
+# org.json 20260719 fixes CVE-2026-59171 (GHSA-ghc9-756g-vrcv): unbounded numeric-literal DoS. Buildscript classpath via settings.gradle.
+patch-cve-2026-59171 = { module = "org.json:json", version = { strictly = "[20260719,)", prefer = "20260719" } }
+
 [bundles]
-security-patches = ["patch-cve-2026-54399", "patch-cve-2026-54428", "patch-cve-2026-71290", "patch-cve-2026-75140", "patch-cve-2026-89407", "patch-cve-2026-91776", "patch-cve-2026-102554"]
+security-patches = ["patch-cve-2026-59171", "patch-cve-2026-54399", "patch-cve-2026-54428", "patch-cve-2026-71290", "patch-cve-2026-75140", "patch-cve-2026-89407", "patch-cve-2026-91776", "patch-cve-2026-102554"]
 
 [plugins]
 git-version = { id = "com.palantir.git-version", version.ref = "git-version" }
