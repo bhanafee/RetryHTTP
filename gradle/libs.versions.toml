@@ -5,7 +5,7 @@ release = "17"
 
 # Plugin versions
 git-version = "5.2.0"
-spotless = "8.10.4"
+spotless = "8.+"
 owasp-dependencycheck = "13.+"
 
 # Logging

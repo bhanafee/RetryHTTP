@@ -357,11 +357,10 @@ public class RetryAfterParser implements Function<HttpServletResponse, Optional<
     return h ->
         parser
             .apply(h)
-            .map(
-                t -> {
-                  final Duration difference = Duration.between(clock.instant(), t.toInstant());
-                  return difference.isNegative() ? Duration.ZERO : difference;
-                });
+            .map(t -> {
+              final Duration difference = Duration.between(clock.instant(), t.toInstant());
+              return difference.isNegative() ? Duration.ZERO : difference;
+            });
   }
 
   /**
